@@ -1,9 +1,8 @@
 {
   "id": "cex-drochilni",
-  "title": "Cex-дрочильни",
+  "title": "Цex дрочильни",
   "year": 2024,
-  "short": "Короткое описание для карточки на главной.",
-  "description": "Полное описание игры. Можно в несколько предложений, без HTML.",
+  "description": "Тебе нужно строить свою империю дрочильни! Игра представляет собой сатиру над типичными фермами где важен только донат. Игра в плохо-нарисованном стиле, с присутвием хуев и ненармотивной лексики.",
   "banner": "banner.png",
   "logo": "logo.png",
   "screenshots": [
@@ -14,22 +13,23 @@
   "downloads": [
     {
       "label": "Скачать .apk",
-      "url": "https://example.com/cex-drochilni.apk",
-      "version": "v0.2.0 (alpha 2)",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/Games/cex-drochilni-android-alpha2-v0.2.0-release.apk",
+      "version": "v0.2.0 (alpha 2) Данный APK билд нестабилен, сохранения не работают. Не рекомендуется нажимать кнопку назад на устройстве.",
       "year": 2025,
       "style": "green"
     },
     {
-      "label": "Скачать .newcatroid",
-      "url": "https://example.com/cex-drochilni.newcatroid",
-      "version": "v0.2.0 (ported) (alpha 2)",
+      "label": "Скачать .newtrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/Games/cex-drochilni-src-alpha2-v0.2.0-release.newtrobat",
+      "version": "v0.2.0 (alpha 2)",
       "year": 2024,
       "style": "white"
     },
     {
       "label": "Скачать .catrobat",
-      "url": "https://example.com/cex-drochilni.catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/Games/cex-drochilni-src-v0.1.0-alpha1-release.catrobat",
       "version": "v0.1.0 (alpha 1)",
+	  "year": 2024,
       "style": "white"
     }
   ]
