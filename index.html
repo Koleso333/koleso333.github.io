@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Koleso Dev — личный хаб</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="loading">
+<!-- Чёрный экран до загрузки JSON -->
+<div id="app-loader" class="app-loader"></div>
+
+<header class="site-header" id="top">
+    <div class="header-inner">
+        <div class="brand">
+            <div class="hero">
+                <div class="hero-square hero-square--left"></div>
+                <div class="hero-square hero-square--right"></div>
+                <h1 class="hero-title">Koleso</h1>
+            </div>
+
+            <p class="brand-subtitle">
+                личный хаб игр, саундтреков и прочих штук
+            </p>
+        </div>
+
+        <nav class="nav" id="nav">
+            <!-- дефолтные пункты (перезапишутся из JSON) -->
+            <a href="#about" class="nav-link">Обо мне</a>
+            <a href="#games" class="nav-link">Игры</a>
+            <a href="#news" class="nav-link">Саундтреки</a>
+            <a href="#news" class="nav-link">Новости</a>
+            <a href="#contacts" class="nav-link">Контакты</a>
+        </nav>
+    </div>
+</header>
+
+<main class="page">
+
+    <!-- ОБО МНЕ -->
+    <section id="about" class="section card observe" data-section>
+        <h2 class="section-title" id="about-title">Обо мне</h2>
+        <p class="section-text" id="about-text">
+            Меня зовут <strong>Колесо</strong>. Я начинающий разработчик игр, люблю что‑либо создавать
+            и экспериментировать. Этот сайт — моя небольшая визитка и точка входа
+            ко всем проектам: играм, саундтрекам и другим штукам.
+        </p>
+    </section>
+
+    <!-- ИГРЫ -->
+    <section id="games" class="section card observe" data-section>
+        <h2 class="section-title" id="games-title">Игры</h2>
+        <p class="section-text" id="games-text">
+            Здесь будут мои игры. Позже я добавлю сюда карточки с описаниями и ссылками.
+        </p>
+
+        <div class="games-grid" id="games-grid">
+            <!-- карточки игр подставятся из JSON -->
+        </div>
+    </section>
+
+    <!-- НОВОСТИ -->
+    <section id="news" class="section card observe" data-section>
+        <h2 class="section-title" id="news-title">Новости</h2>
+
+        <div class="news-list" id="news-list">
+            <!-- сюда JS подставит новости -->
+        </div>
+    </section>
+
+    <!-- КОНТАКТЫ -->
+    <section id="contacts" class="section card observe" data-section>
+        <h2 class="section-title" id="contacts-title">Контакты</h2>
+        <ul class="contacts-list" id="contacts-list">
+            <!-- контакты подставятся из JSON -->
+        </ul>
+    </section>
+</main>
+
+<footer class="footer">
+    <span>© <span id="year"></span> Koleso</span>
+</footer>
+
+<script>
+    (function () {
+        // Анимация появления секций
+        const sections = document.querySelectorAll('[data-section]');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('section--visible');
+                }
+            });
+        }, {
+            threshold: 0.35
+        });
+
+        sections.forEach(section => observer.observe(section));
+
+        // Год в подвале
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const newsContainer  = document.getElementById('news-list');
+        const gamesContainer = document.getElementById('games-grid');
+
+        // ====== CONTENT.JSON (тексты) ======
+        async function loadContentJson() {
+            try {
+                const res = await fetch('content/content.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                applyContent(data);
+            } catch (err) {
+                console.error('Ошибка загрузки content.json:', err);
+            }
+        }
+
+        function applyContent(data) {
+            // Title
+            if (data.meta && data.meta.title) {
+                document.title = data.meta.title;
+            }
+
+            // Шапка
+            const heroTitleEl = document.querySelector('.hero-title');
+            const brandSubtitleEl = document.querySelector('.brand-subtitle');
+
+            if (data.brand) {
+                if (data.brand.heroTitle && heroTitleEl) {
+                    heroTitleEl.textContent = data.brand.heroTitle;
+                }
+                if (data.brand.subtitle && brandSubtitleEl) {
+                    brandSubtitleEl.textContent = data.brand.subtitle;
+                }
+            }
+
+            // Навигация
+            const navEl = document.getElementById('nav');
+            if (navEl && Array.isArray(data.nav)) {
+                navEl.innerHTML = '';
+                data.nav.forEach(item => {
+                    const a = document.createElement('a');
+                    a.className = 'nav-link';
+                    a.href = '#' + item.id;
+                    a.textContent = item.label;
+                    navEl.appendChild(a);
+                });
+            }
+
+            // Секции (любые id из data.sections)
+            if (data.sections) {
+                Object.entries(data.sections).forEach(([id, sec]) => {
+                    const titleEl = document.getElementById(id + '-title');
+                    const textEl  = document.getElementById(id + '-text');
+
+                    if (titleEl && sec.title) {
+                        titleEl.textContent = sec.title;
+                    }
+                    if (textEl) {
+                        if (sec.html) textEl.innerHTML = sec.html;
+                        else if (sec.text) textEl.textContent = sec.text;
+                    }
+                });
+            }
+
+            // Контакты
+            const contactsList = document.getElementById('contacts-list');
+            if (contactsList && Array.isArray(data.contacts)) {
+                contactsList.innerHTML = '';
+                data.contacts.forEach(c => {
+                    const li = document.createElement('li');
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'contact-label';
+                    labelSpan.textContent = c.label || '';
+
+                    const link = document.createElement('a');
+                    link.className = 'contact-link';
+                    link.href = c.href || '#';
+                    link.textContent = c.text || '';
+                    if (c.href && c.href.startsWith('http')) {
+                        link.target = '_blank';
+                    }
+
+                    li.appendChild(labelSpan);
+                    li.appendChild(link);
+                    contactsList.appendChild(li);
+                });
+            }
+        }
+
+        // ====== NEWS.JSON (новости) ======
+        async function loadNewsJson() {
+            try {
+                if (!newsContainer) return;
+                const res = await fetch('content/news.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const items = await res.json();
+                renderNews(items, newsContainer);
+            } catch (err) {
+                console.error('Ошибка загрузки news.json:', err);
+                if (newsContainer) {
+                    newsContainer.innerHTML = '<p class="news-error">Не удалось загрузить новости.</p>';
+                }
+            }
+        }
+
+        function renderNews(items, container) {
+            container.innerHTML = '';
+            items.forEach(item => {
+                const article = document.createElement('article');
+                article.className = 'news-item';
+
+                const wrapperTag = (item.clickable && item.url) ? 'a' : 'div';
+                const wrapper = document.createElement(wrapperTag);
+
+                if (wrapperTag === 'a') {
+                    wrapper.href = item.url;
+                    wrapper.className = 'news-item-link';
+                } else {
+                    wrapper.className = 'news-item-content';
+                }
+
+                if (item.date || item.dateLabel) {
+                    const time = document.createElement('time');
+                    time.className = 'news-date';
+                    if (item.date) time.dateTime = item.date;
+                    time.textContent = item.dateLabel || item.date || '';
+                    wrapper.appendChild(time);
+                }
+
+                if (item.title) {
+                    const h3 = document.createElement('h3');
+                    h3.className = 'news-title';
+                    h3.textContent = item.title;
+                    wrapper.appendChild(h3);
+                }
+
+                if (item.text) {
+                    const p = document.createElement('p');
+                    p.className = 'news-text';
+                    p.textContent = item.text;
+                    wrapper.appendChild(p);
+                }
+
+                article.appendChild(wrapper);
+                container.appendChild(article);
+            });
+        }
+
+        // ====== GAMES.JSON + infogame.json ======
+        async function loadGamesJson() {
+            try {
+                if (!gamesContainer) return;
+                const res = await fetch('content/games.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const list = await res.json();
+                await renderGames(list, gamesContainer);
+            } catch (err) {
+                console.error('Ошибка загрузки games.json:', err);
+            }
+        }
+
+        async function renderGames(list, container) {
+            container.innerHTML = '';
+
+            for (const item of list) {
+                const id = item.id;
+                try {
+                    const res = await fetch(`games/${id}/infogame.json`);
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const game = await res.json();
+
+                    const title = game.title || id;
+
+                    // корректный путь к логотипу
+                    let logoPath;
+                    if (game.logo) {
+                        if (game.logo.startsWith('http') || game.logo.startsWith('/')) {
+                            logoPath = game.logo;
+                        } else {
+                            logoPath = `games/${id}/${game.logo}`;
+                        }
+                    } else {
+                        logoPath = `games/${id}/logo.png`;
+                    }
+
+                    const card = document.createElement('a');
+                    card.href = `games/${id}/index.html`;
+                    card.target = '_blank';
+                    card.className = 'game-card';
+
+                    const img = document.createElement('img');
+                    img.src = logoPath;
+                    img.alt = title;
+                    img.className = 'game-card-logo';
+
+                    const nameEl = document.createElement('div');
+                    nameEl.className = 'game-card-title';
+                    nameEl.textContent = title;
+
+                    card.appendChild(img);
+                    card.appendChild(nameEl);
+
+                    container.appendChild(card);
+                } catch (err) {
+                    console.error('Ошибка загрузки игры', id, err);
+                }
+            }
+        }
+
+        // Ждём загрузки трёх JSON'ов, потом убираем чёрный экран
+        Promise.all([
+            loadContentJson(),
+            loadNewsJson(),
+            loadGamesJson()
+        ]).finally(() => {
+            document.body.classList.remove('loading');
+        });
+    })();
+</script>
+</body>
+</html>

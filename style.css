@@ -1,0 +1,739 @@
+/* Подключаем Roboto с Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+
+/* Локальный шрифт Mitr (файл Mitr.ttf лежит рядом с index.html и style.css) */
+@font-face {
+    font-family: "Mitr";
+    src: url("Mitr.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Базовый юнит для шапки: от него считаются размер квадратов, шрифт, смещения */
+:root {
+    --hero-square: min(13vw, 110px);
+}
+
+/* =========================
+   БАЗА
+   ========================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* По умолчанию всё — Roboto, чуть жирнее обычного */
+body {
+    min-height: 100vh;
+    background: #000;
+    color: #fff;
+    font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 500;
+}
+
+/* Чёрный экран до загрузки JSON */
+.app-loader {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 2000;
+}
+
+/* Пока body.loading — контент скрыт */
+body.loading .site-header,
+body.loading .page,
+body.loading .footer {
+    visibility: hidden;
+}
+
+/* Когда класс loading убран — скрываем лоадер */
+body:not(.loading) .app-loader {
+    display: none;
+}
+
+/* =========================
+   ШАПКА / HERO
+   ========================= */
+
+.site-header {
+    padding: 24px 16px 40px;
+}
+
+.header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.brand {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* Вся шапка — Mitr */
+.site-header,
+.hero-title,
+.brand-subtitle,
+.nav-link {
+    font-family: "Mitr", "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 400;
+}
+
+.brand-subtitle {
+    font-size: 14px;
+    color: #d0d0d0;
+    margin-top: 8px;
+}
+
+/* Блок с логотипом и квадратами */
+.hero {
+    position: relative;
+    height: calc(var(--hero-square) * 1.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+
+.hero-title {
+    font-size: calc(var(--hero-square) * 0.7);
+    letter-spacing: 0;
+    text-transform: none;
+    color: #ffffff;
+    mix-blend-mode: difference;
+    z-index: 2;
+}
+
+/* Белые квадраты */
+.hero-square {
+    position: absolute;
+    width: var(--hero-square);
+    height: var(--hero-square);
+    background: #ffffff;
+    border-radius: 8px;
+    z-index: 1;
+}
+
+/* Левый — ПРОТИВ часовой */
+.hero-square--left {
+    animation: spin-left 16s linear infinite;
+}
+
+/* Правый — по часовой */
+.hero-square--right {
+    animation: spin-right 18s linear infinite;
+}
+
+@keyframes spin-left {
+    0% {
+        transform: translate(
+            calc(-1.1 * var(--hero-square)),
+            calc(0.1 * var(--hero-square))
+        ) rotate(-18deg);
+    }
+    100% {
+        transform: translate(
+            calc(-1.1 * var(--hero-square)),
+            calc(0.1 * var(--hero-square))
+        ) rotate(-378deg);
+    }
+}
+
+@keyframes spin-right {
+    0% {
+        transform: translate(
+            calc(1.1 * var(--hero-square)),
+            calc(-0.1 * var(--hero-square))
+        ) rotate(18deg);
+    }
+    100% {
+        transform: translate(
+            calc(1.1 * var(--hero-square)),
+            calc(-0.1 * var(--hero-square))
+        ) rotate(378deg);
+    }
+}
+
+/* Навигация в шапке */
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 18px;
+    margin-top: 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+}
+
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.nav-link:hover {
+    opacity: 1;
+}
+
+/* =========================
+   КОНТЕНТ
+   ========================= */
+
+.page {
+    max-width: 960px;
+    margin: 0 auto 56px;
+    padding: 0 16px 24px;
+}
+
+/* Белые карточки-секции */
+.section.card {
+    background: #ffffff;
+    color: #000000;
+    border-radius: 20px;
+    padding: 20px 20px 22px;
+    margin-top: 20px;
+}
+
+/* Анимация появления секций */
+.observe {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.section--visible.observe {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.section-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.section-text {
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+/* =========================
+   ИГРЫ — сетка карточек на главной
+   ========================= */
+
+.games-grid {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.game-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 16px 20px;
+    background: #ffffff;
+    color: #000000;
+    border-radius: 18px;
+    border: 1px solid #e0e0e0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-1px);
+    border-color: #000000;
+}
+
+.game-card-logo {
+    width: 96px;
+    height: 96px;
+    border-radius: 18px;
+    object-fit: cover;
+    margin-bottom: 8px;
+    background: #000;
+}
+
+.game-card-title {
+    font-size: 15px;
+    text-align: left;
+}
+
+/* =========================
+   НОВОСТИ
+   ========================= */
+
+/* Цифры (даты и год) — Mitr */
+.news-date,
+#year {
+    font-family: "Mitr", "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 400;
+}
+
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.news-item {
+    padding-top: 8px;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* Обёртка для новости (кликабельная и нет) */
+.news-item-link,
+.news-item-content {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.news-item-link:hover {
+    text-decoration: none;
+}
+
+.news-date {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #777777;
+    margin-bottom: 4px;
+}
+
+.news-title {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.news-text {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.news-error {
+    font-size: 14px;
+    color: #aa0000;
+}
+
+/* =========================
+   КОНТАКТЫ
+   ========================= */
+
+.contacts-list {
+    list-style: none;
+    margin-top: 2px;
+}
+
+.contacts-list li + li {
+    margin-top: 8px;
+}
+
+.contact-label {
+    display: inline-block;
+    width: 80px;
+    font-size: 13px;
+    color: #666666;
+}
+
+.contact-link {
+    font-size: 14px;
+    text-decoration: none;
+    color: #000000;
+    border-bottom: 1px solid transparent;
+}
+
+.contact-link:hover {
+    border-bottom-color: #000000;
+}
+
+/* =========================
+   ПОДВАЛ
+   ========================= */
+
+.footer {
+    max-width: 960px;
+    margin: 0 auto 24px;
+    padding: 0 16px;
+    font-size: 12px;
+    color: #b0b0b0;
+    text-align: right;
+}
+
+/* =========================
+   СТРАНИЦА ИГРЫ
+   ========================= */
+
+.game-page {
+    background: #000;
+    color: #fff;
+}
+
+.game-page-main {
+    max-width: 960px;
+    margin: 0 auto 40px;
+    padding: 0 16px 32px;
+}
+
+/* Хедер игры с баннером */
+.game-hero {
+    position: relative;
+    margin: 24px -16px 32px;
+    height: 390px;
+    background-color: #111;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 0 0 24px 24px;
+    overflow: hidden;
+}
+
+/* градиент снизу вверх */
+.game-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+    z-index: 1;
+}
+
+.game-hero-inner {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    padding: 32px 32px 26px;
+    gap: 28px;
+}
+
+/* Год игры в баннере (справа снизу) */
+.game-year-tag {
+    position: absolute;
+    right: 20px;
+    bottom: 14px;
+    z-index: 2;
+    font-size: 12px;
+    color: #d0d0d0;
+    opacity: 0.85;
+}
+
+.game-logo {
+    width: 144px;
+    height: 144px;
+    border-radius: 26px;
+    background: #ffffff;
+    object-fit: cover;
+}
+
+.game-hero-text {
+    max-width: 600px;
+}
+
+.game-page-title {
+    font-family: "Mitr", "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 42px;
+    margin-bottom: 8px;
+}
+
+.game-page-description {
+    font-size: 18px;
+    color: #e0e0e0;
+}
+
+/* Блок скриншотов: карусель */
+.game-section {
+    margin-top: 20px;
+}
+
+.game-section-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.game-screens-wrapper {
+    position: relative;
+    margin-top: 10px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.game-screens {
+    display: flex;
+    transition: transform 0.3s ease;
+}
+
+.game-screens img {
+    width: 100%;
+    flex-shrink: 0;
+    display: block;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+/* Стрелки карусели */
+.screen-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #ffffff;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    opacity: 0.9;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.screen-nav--left {
+    left: 8px;
+}
+
+.screen-nav--right {
+    right: 8px;
+}
+
+.screen-nav:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05);
+}
+
+.screen-nav--disabled {
+    opacity: 0.0;
+    pointer-events: none;
+}
+
+/* Градиенты по краям */
+.game-screens-gradient {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 32px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.game-screens-gradient--left {
+    left: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.7), transparent);
+}
+
+.game-screens-gradient--right {
+    right: 0;
+    background: linear-gradient(to left, rgba(0,0,0,0.7), transparent);
+}
+
+/* =========================
+   ВЬЮЕР СКРИНШОТОВ
+   ========================= */
+
+.screenshot-viewer {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 3000;
+}
+
+.screenshot-viewer.viewer--open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.screenshot-viewer-inner {
+    position: relative;
+    max-width: 92vw;
+    max-height: 92vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.screenshot-viewer-img {
+    max-width: 100%;
+    max-height: 100%;
+    transform: scale(1);
+    transition: transform 0.25s ease;
+    cursor: zoom-in;
+}
+
+.screenshot-viewer-img.zoomed {
+    cursor: zoom-out;
+}
+
+.screenshot-viewer-close {
+    position: absolute;
+    top: -32px;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #ffffff;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================
+   КНОПКИ СКАЧИВАНИЯ НА СТРАНИЦЕ ИГРЫ
+   ========================= */
+
+.game-downloads {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.download-button {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    min-width: 260px;
+    max-width: 360px;
+    padding: 14px 20px 20px 20px;
+    border-radius: 18px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+
+    transition: transform 0.12s ease, box-shadow 0.12s ease,
+                border-color 0.12s ease, background-color 0.12s ease,
+                color 0.12s ease;
+}
+
+.download-button-label {
+    font-size: 15px;
+}
+
+.download-button-version {
+    margin-top: 3px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Год на кнопке (слева снизу, не влияет на высоту) */
+.download-button-year {
+    position: absolute;
+    left: 12px;
+    bottom: 6px;
+    font-size: 10px;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.download-button--green .download-button-year {
+    color: #e5ffe5;
+}
+
+.download-button--white .download-button-year {
+    color: #555555;
+}
+
+/* зелёная кнопка */
+.download-button--green {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.download-button--green .download-button-version {
+    color: #e5ffe5;
+}
+
+/* белая кнопка */
+.download-button--white {
+    background: #ffffff;
+    color: #000000;
+    border-color: #e0e0e0;
+}
+
+.download-button--white .download-button-version {
+    color: #555555;
+}
+
+/* hover-анимация */
+.download-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: #000000;
+}
+
+/* =========================
+   АДАПТИВ
+   ========================= */
+
+@media (max-width: 600px) {
+    .site-header {
+        padding: 20px 12px 32px;
+    }
+
+    .section.card {
+        padding: 18px 16px 20px;
+    }
+
+    .game-hero {
+        margin: 12px -16px 24px;
+        height: 300px;
+    }
+
+    .game-hero-inner {
+        padding: 22px 18px 20px;
+        gap: 18px;
+    }
+
+    .game-logo {
+        width: 110px;
+        height: 110px;
+        border-radius: 22px;
+    }
+
+    .game-page-title {
+        font-size: 28px;
+    }
+
+    .game-page-description {
+        font-size: 16px;
+    }
+
+    .download-button {
+        width: 100%;
+        max-width: none;
+    }
+}
