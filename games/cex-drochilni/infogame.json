@@ -1,0 +1,36 @@
+{
+  "id": "cex-drochilni",
+  "title": "Cex-дрочильни",
+  "year": 2024,
+  "short": "Короткое описание для карточки на главной.",
+  "description": "Полное описание игры. Можно в несколько предложений, без HTML.",
+  "banner": "banner.png",
+  "logo": "logo.png",
+  "screenshots": [
+    "screenshot-1.png",
+    "screenshot-2.png",
+    "screenshot-3.png"
+  ],
+  "downloads": [
+    {
+      "label": "Скачать .apk",
+      "url": "https://example.com/cex-drochilni.apk",
+      "version": "v0.2.0 (alpha 2)",
+      "year": 2025,
+      "style": "green"
+    },
+    {
+      "label": "Скачать .newcatroid",
+      "url": "https://example.com/cex-drochilni.newcatroid",
+      "version": "v0.2.0 (ported) (alpha 2)",
+      "year": 2024,
+      "style": "white"
+    },
+    {
+      "label": "Скачать .catrobat",
+      "url": "https://example.com/cex-drochilni.catrobat",
+      "version": "v0.1.0 (alpha 1)",
+      "style": "white"
+    }
+  ]
+}

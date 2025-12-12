@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>ДМК SOUNDTRACK</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+
+    :root { --beat: 0; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #202040, #050510);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* ===== ЭФФЕКТНЫЙ CSS-ФОН ДЛЯ 1.mp3 ===== */
+
+    .fx-backdrop {
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease, background 0.6s ease;
+      z-index: 1;
+    }
+
+    body.fx-track1-base .fx-backdrop {
+      opacity: 1;
+      background: #000;
+    }
+
+    body.fx-track1-phase1 .fx-backdrop {
+      opacity: 1;
+      background: radial-gradient(circle at top, #3b0210, #050005);
+    }
+
+    body.fx-track1-phase1 h1 { color: #fee2e2; }
+    body.fx-track1-phase1 .subtitle { color: #fecaca; }
+    body.fx-track1-phase1 .np-title { color: #fee2e2; }
+
+    body.fx-track1-phase1 .round-btn.big {
+      background: #ef4444;
+      box-shadow: 0 0 18px rgba(248, 113, 113, 0.85);
+    }
+
+    body.fx-track1-phase1 .progress {
+      background: rgba(127, 29, 29, 0.6);
+    }
+
+    body.fx-track1-phase1 .progress-fill {
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      box-shadow: 0 0 calc(22px * var(--beat)) rgba(248, 113, 113, 0.95);
+    }
+
+    body.fx-track1-phase1 .vis-bar {
+      background: linear-gradient(
+        to top,
+        rgba(239, 68, 68, 0.92),
+        rgba(248, 113, 113, 0.6),
+        rgba(248, 250, 252, 0.05)
+      );
+    }
+
+    /* ===== СЕРЫЙ АКЦЕНТ (финальная фаза 1.mp3) ===== */
+
+    body.fx-track1-gray h1 { color: #d1d5db; }
+    body.fx-track1-gray .subtitle { color: #9ca3af; }
+    body.fx-track1-gray .np-title { color: #d1d5db; }
+    body.fx-track1-gray .np-artist { color: #6b7280; }
+
+    body.fx-track1-gray .round-btn.big {
+      background: #6b7280;
+      box-shadow: 0 0 14px rgba(107, 114, 128, 0.7);
+    }
+
+    body.fx-track1-gray .progress {
+      background: rgba(75, 85, 99, 0.5);
+    }
+
+    body.fx-track1-gray .progress-fill {
+      background: linear-gradient(90deg, #6b7280, #9ca3af);
+      box-shadow: 0 0 calc(14px * var(--beat)) rgba(156, 163, 175, 0.7);
+    }
+
+    body.fx-track1-gray .vis-bar {
+      background: linear-gradient(
+        to top,
+        rgba(107, 114, 128, 0.9),
+        rgba(156, 163, 175, 0.5),
+        rgba(248, 250, 252, 0.03)
+      );
+    }
+
+    /* ===== СТИЛЬ ДЛЯ 2.mp3 (гроза) ===== */
+
+    body.fx-track2-storm h1 { color: #e2e8f0; }
+    body.fx-track2-storm .subtitle { color: #94a3b8; }
+    body.fx-track2-storm .np-title { color: #f1f5f9; }
+    body.fx-track2-storm .np-artist { color: #cbd5e1; }
+
+    body.fx-track2-storm .round-btn.big {
+      background: #475569;
+      box-shadow: 0 0 18px rgba(100, 116, 139, 0.8);
+    }
+
+    body.fx-track2-storm .progress {
+      background: rgba(71, 85, 105, 0.5);
+    }
+
+    body.fx-track2-storm .progress-fill {
+      background: linear-gradient(90deg, #64748b, #94a3b8);
+      box-shadow: 0 0 calc(18px * var(--beat)) rgba(148, 163, 184, 0.9);
+    }
+
+    body.fx-track2-storm .vis-bar {
+      background: linear-gradient(
+        to top,
+        rgba(100, 116, 139, 0.9),
+        rgba(148, 163, 184, 0.5),
+        rgba(241, 245, 249, 0.08)
+      );
+    }
+
+    /* ===== КОНТЕЙНЕР ===== */
+
+    .stage {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    /* WebGL canvas-оверлей под UI, над CSS-фоном */
+
+    .gl-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      background: transparent;
+    }
+
+    body.gl-shader-active .gl-canvas {
+      opacity: 1;
+    }
+
+    /* ===== КАМЕРА И ЛЕЙАУТ ===== */
+
+    .camera {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center center;
+      transition: transform 0.06s linear;
+      z-index: 3;
+    }
+
+    .app {
+      position: relative;
+      z-index: 3;
+      width: min(920px, 100%);
+      padding: 16px 20px 24px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .app-header {
+      margin-bottom: 16px;
+    }
+
+    h1, .subtitle, .np-title, .np-artist,
+    .round-btn.big, .progress, .progress-fill, .vis-bar {
+      transition:
+        color 0.4s ease,
+        background 0.4s ease,
+        box-shadow 0.4s ease,
+        border-color 0.4s ease;
+    }
+
+    h1 {
+      margin: 0 0 6px 0;
+      font-size: 26px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #9ca3af;
+      margin: 0;
+    }
+
+    /* ===== КНОПКА / ПАНЕЛЬ ТРЕКОВ ===== */
+
+    .track-menu {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      z-index: 5;
+    }
+
+    .track-menu-toggle {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.85);
+      color: #e5e7eb;
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+    }
+
+    .track-menu-toggle:hover {
+      background: rgba(37, 99, 235, 0.88);
+      border-color: rgba(191, 219, 254, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .track-menu-panel {
+      position: absolute;
+      right: 0;
+      top: 110%;
+      margin-top: 6px;
+      width: 260px;
+      max-height: 340px;
+      padding: 10px 10px 8px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      backdrop-filter: blur(14px);
+    }
+
+    .track-menu.open .track-menu-panel {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .track-menu-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .track-menu-list {
+      list-style: none;
+      margin: 4px 0 0;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.8) transparent;
+    }
+
+    .track-menu-list::-webkit-scrollbar { width: 6px; }
+    .track-menu-list::-webkit-scrollbar-track { background: transparent; }
+    .track-menu-list::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.6);
+      border-radius: 999px;
+    }
+
+    .track-menu-item {
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #e5e7eb;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .track-menu-item:hover {
+      background: rgba(59, 130, 246, 0.18);
+    }
+
+    .track-menu-item.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .track-menu-options-group {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(148,163,184,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .track-menu-options {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .track-menu-options input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15,23,42,0.95);
+      box-shadow: 0 0 0 1px rgba(15,23,42,1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .track-menu-options input[type="checkbox"]::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: #3b82f6;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+    }
+
+    .track-menu-options input[type="checkbox"]:checked {
+      border-color: #60a5fa;
+      box-shadow: 0 0 6px rgba(37, 99, 235, 0.8);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .track-menu-options input[type="checkbox"]:checked::after {
+      opacity: 1;
+    }
+
+    /* ===== ВИЗУАЛИЗАТОР СНИЗУ ===== */
+
+    .visualizer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .visualizer-inner {
+      width: min(1100px, 100vw);
+      height: 160px;
+      margin-bottom: clamp(80px, 15vh, 200px);
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      filter: blur(0.4px);
+    }
+
+    .visualizer.active .visualizer-inner { opacity: 0.55; }
+
+    .vis-bar {
+      flex: 1;
+      height: 60px;
+      border-radius: 4px;
+      background: linear-gradient(
+        to top,
+        rgba(59, 130, 246, 0.9),
+        rgba(129, 140, 248, 0.4),
+        rgba(248, 250, 252, 0.02)
+      );
+      transform-origin: bottom center;
+      transform: scaleY(0.12);
+      opacity: 0.9;
+    }
+
+    /* ===== ПЛЕЕР ===== */
+
+    .player {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .player-left {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cover-wrap {
+      position: relative;
+      width: 220px;
+      max-width: 60vw;
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 1);
+      cursor: pointer;
+    }
+
+    .cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cover-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -18%;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(96, 165, 250, 0.9), transparent 55%),
+        radial-gradient(circle at 70% 80%, rgba(249, 115, 22, 0.7), transparent 55%);
+      opacity: calc(0.15 + 0.6 * var(--beat));
+      filter: blur(26px);
+      z-index: -1;
+    }
+
+    .cover-wrap.no-cover .cover-img { display: none; }
+    .cover-wrap.no-cover::after {
+      content: '?';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 72px;
+      font-weight: 700;
+      color: #9ca3af;
+      background: rgba(15, 23, 42, 1);
+      z-index: 0;
+    }
+
+    .time-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .time-row span {
+      font-size: 12px;
+      color: #9ca3af;
+      width: 60px;
+      text-align: center;
+    }
+
+    .progress {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.25);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #a855f7);
+      box-shadow: 0 0 calc(20px * var(--beat)) rgba(59, 130, 246, 0.9);
+      transition: width 0.05s linear;
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .round-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition:
+        background 0.15s ease,
+        transform 0.1s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .round-btn.big {
+      width: 44px;
+      height: 44px;
+      font-size: 18px;
+      background: #3b82f6;
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.7);
+    }
+
+    .round-btn:hover {
+      background: rgba(30, 64, 175, 0.95);
+      box-shadow: 0 0 14px rgba(129, 140, 248, 0.7);
+    }
+
+    .round-btn:active { transform: scale(0.95); }
+
+    .player-right {
+      flex: 1 1 0;
+      min-width: 0;
+      padding-top: 4px;
+    }
+
+    .np-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .np-artist {
+      font-size: 14px;
+      color: #9ca3af;
+      margin: 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    /* ===== МОБИЛЬНЫЙ ПОРТРЕТ ===== */
+
+    @media (max-width: 768px) and (orientation: portrait) {
+      .app {
+        padding: 12px 10px 20px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .track-menu { right: 10px; top: 10px; }
+
+      .app-header {
+        margin-top: 30px;
+        margin-bottom: 16px;
+        text-align: center;
+        width: 100%;
+      }
+
+      h1 { font-size: 20px; }
+      .subtitle { font-size: 12px; }
+
+      .player {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .player-left {
+        align-items: center;
+        width: 100%;
+      }
+
+      .cover-wrap {
+        width: min(80vw, 320px);
+      }
+
+      .time-row,
+      .controls-row {
+        width: 100%;
+        max-width: min(80vw, 420px);
+      }
+
+      .time-row span {
+        width: 72px;
+        font-size: 11px;
+      }
+
+      .player-right {
+        width: 100%;
+        padding-top: 10px;
+        text-align: center;
+      }
+
+      .np-title { font-size: 18px; }
+      .np-artist { font-size: 12px; }
+
+      .visualizer-inner {
+        margin-bottom: 40px;
+        height: 120px;
+      }
+    }
+
+    /* ===== МОБИЛЬНЫЙ ГОРИЗОНТАЛЬ ===== */
+
+    @media (max-width: 900px) and (orientation: landscape) {
+      .app {
+        padding: 10px 16px 16px;
+        width: 100%;
+      }
+
+      .app-header {
+        margin-top: 14px;
+        margin-bottom: 10px;
+      }
+
+      h1 { font-size: 22px; }
+      .subtitle { font-size: 12px; }
+
+      .player {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-end;
+        gap: 14px;
+      }
+
+      .player-left {
+        align-items: center;
+      }
+
+      .cover-wrap {
+        width: min(30vw, 160px);
+      }
+
+      .time-row,
+      .controls-row {
+        max-width: min(40vw, 260px);
+      }
+
+      .player-right {
+        max-width: min(45vw, 300px);
+        text-align: left;
+        padding-top: 0;
+      }
+
+      .np-title { font-size: 18px; }
+      .np-artist { font-size: 12px; }
+
+      .visualizer-inner {
+        height: 120px;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <canvas class="gl-canvas" id="gl-canvas"></canvas>
+    <div class="fx-backdrop" id="fx-backdrop"></div>
+
+    <div class="camera" id="camera">
+      <div class="visualizer" id="visualizer">
+        <div class="visualizer-inner" id="visualizer-inner"></div>
+      </div>
+
+      <div class="app">
+        <div class="track-menu" id="track-menu">
+          <button class="track-menu-toggle" id="track-menu-toggle">Треки</button>
+          <div class="track-menu-panel" id="track-menu-panel">
+            <div class="track-menu-title">Треки</div>
+            <ul class="track-menu-list" id="track-menu-list"></ul>
+
+            <div class="track-menu-options-group">
+              <label class="track-menu-options">
+                <input type="checkbox" id="show-ms-checkbox">
+                <span>Видеть миллисекунды</span>
+              </label>
+              <label class="track-menu-options">
+                <input type="checkbox" id="disable-camera-checkbox">
+                <span>Отключить эффекты камеры</span>
+              </label>
+              <label class="track-menu-options">
+                <input type="checkbox" id="disable-vis-checkbox">
+                <span>Отключить полоску ритма</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-header">
+          <h1>ДОГОНИ МЕНЯ, КИРПИЧ! OST</h1>
+          <div class="subtitle">Отменённые саундтреки из отменённой игры (планировались в Lite-release 5)</div>
+        </div>
+
+        <div class="player">
+          <div class="player-left">
+            <div class="cover-wrap" id="cover-wrap">
+              <img src="" alt="Обложка трека" class="cover-img" id="player-cover">
+            </div>
+            <div class="time-row">
+              <span id="current-time">0:00</span>
+              <div class="progress" id="progress">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+              <span id="duration">0:00</span>
+            </div>
+            <div class="controls-row">
+              <button class="round-btn" id="prev-btn" aria-label="Предыдущий трек">⏮</button>
+              <button class="round-btn big" id="play-btn" aria-label="Воспроизвести или пауза">►</button>
+              <button class="round-btn" id="next-btn" aria-label="Следующий трек">⏭</button>
+            </div>
+          </div>
+
+          <div class="player-right">
+            <div class="np-title" id="np-title">Трек 1</div>
+            <div class="np-artist" id="np-artist">Исполнитель</div>
+          </div>
+        </div>
+
+        <audio id="audio"></audio>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
+
+  <script>
+    const camera = document.getElementById('camera');
+    const audio = document.getElementById('audio');
+    const fxBackdrop = document.getElementById('fx-backdrop');
+
+    const coverWrap = document.getElementById('cover-wrap');
+    const coverImg = document.getElementById('player-cover');
+    const titleEl = document.getElementById('np-title');
+    const artistEl = document.getElementById('np-artist');
+    const curTimeEl = document.getElementById('current-time');
+    const durTimeEl = document.getElementById('duration');
+    const progressBar = document.getElementById('progress');
+    const progressFill = document.getElementById('progress-fill');
+    const playBtn = document.getElementById('play-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    const visualizer = document.getElementById('visualizer');
+    const visInner = document.getElementById('visualizer-inner');
+
+    const trackMenu = document.getElementById('track-menu');
+    const trackMenuToggle = document.getElementById('track-menu-toggle');
+    const trackMenuPanel = document.getElementById('track-menu-panel');
+    const trackListEl = document.getElementById('track-menu-list');
+    const showMsCheckbox = document.getElementById('show-ms-checkbox');
+    const disableCamCheckbox = document.getElementById('disable-camera-checkbox');
+    const disableVisCheckbox = document.getElementById('disable-vis-checkbox');
+
+    const trackItemEls = [];
+
+    const VIS_BARS = 41;
+    const CENTER_BAR = Math.floor(VIS_BARS / 2);
+    const barElems = [];
+    for (let i = 0; i < VIS_BARS; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'vis-bar';
+      visInner.appendChild(bar);
+      barElems.push(bar);
+    }
+
+    let tracks = [];
+    let currentIndex = 0;
+
+    let showMs = false;
+    let disableCameraFx = false;
+    let disableVisualizer = false;
+
+    const FX_TRACK1_FILE = '1.mp3';
+    const FX_TRACK2_FILE = '2.mp3';
+    let shakeEnabled = false;
+
+    const PLAY_ICON = '►';
+    const PAUSE_ICON = '❚❚';
+
+    let currentBeat = 0;
+
+    // 0 — выкл, 1 — ECG, 2 — ECG+градиенты, 3 — градиенты, 4 — костяной глитч, 5 — гроза
+    let glOverlayMode = 0;
+
+    // Поворот камеры
+    let camAngleDeg = 0;
+
+    // адаптив
+    const mqMobilePortrait = window.matchMedia('(max-width: 768px) and (orientation: portrait)');
+    let isMobilePortrait = mqMobilePortrait.matches;
+    function handleMobilePortraitChange(e) { isMobilePortrait = e.matches; }
+    if (mqMobilePortrait.addEventListener) mqMobilePortrait.addEventListener('change', handleMobilePortraitChange);
+    else if (mqMobilePortrait.addListener) mqMobilePortrait.addListener(handleMobilePortraitChange);
+
+    function pictureToDataUrl(picture) {
+      if (!picture || !picture.data || !picture.format) return null;
+      let base64String = '';
+      const data = picture.data;
+      for (let i = 0; i < data.length; i++) base64String += String.fromCharCode(data[i]);
+      return `data:${picture.format};base64,${btoa(base64String)}`;
+    }
+
+    function formatTime(sec) {
+      if (!isFinite(sec)) return showMs ? '0:00.000' : '0:00';
+      const whole = Math.floor(sec);
+      const ms = Math.floor((sec - whole) * 1000);
+      const m = Math.floor(whole / 60);
+      const s = whole % 60;
+      const sStr = s < 10 ? '0' + s : '' + s;
+      if (!showMs) return `${m}:${sStr}`;
+      return `${m}:${sStr}.${ms.toString().padStart(3, '0')}`;
+    }
+
+    function applyTrackToUI() {
+      const t = tracks[currentIndex];
+      if (!t) return;
+
+      titleEl.textContent = t.title || `Трек ${currentIndex + 1}`;
+      artistEl.textContent = t.artist || '';
+
+      if (t.coverUrl) {
+        coverImg.src = t.coverUrl;
+        coverImg.style.display = 'block';
+        coverWrap.classList.remove('no-cover');
+      } else {
+        coverImg.src = '';
+        coverImg.style.display = 'none';
+        coverWrap.classList.add('no-cover');
+      }
+
+      curTimeEl.textContent = formatTime(0);
+      durTimeEl.textContent = formatTime(audio.duration || 0);
+      progressFill.style.width = '0%';
+
+      updateActiveTrackInList();
+    }
+
+    function updateActiveTrackInList() {
+      trackItemEls.forEach((li, idx) => {
+        if (!li) return;
+        li.classList.toggle('active', idx === currentIndex);
+      });
+    }
+
+    function isFxTrack1Now() {
+      const t = tracks[currentIndex];
+      return t && t.file === FX_TRACK1_FILE;
+    }
+
+    function isFxTrack2Now() {
+      const t = tracks[currentIndex];
+      return t && t.file === FX_TRACK2_FILE;
+    }
+
+    function selectTrack(index, autoPlay = false) {
+      if (!tracks.length) return;
+      if (index < 0) index = tracks.length - 1;
+      if (index >= tracks.length) index = 0;
+
+      resetFx();
+
+      currentIndex = index;
+      const t = tracks[currentIndex];
+
+      audio.src = t.file;
+      audio.currentTime = 0;
+
+      applyTrackToUI();
+
+      if (autoPlay) audio.play();
+    }
+
+    function buildTrackList() {
+      trackListEl.innerHTML = '';
+      trackItemEls.length = 0;
+      tracks.forEach((t, index) => {
+        const li = document.createElement('li');
+        li.className = 'track-menu-item';
+        li.textContent = t.title || `Трек ${index + 1}`;
+        li.dataset.index = index;
+        li.addEventListener('click', () => selectTrack(index, true));
+        trackListEl.appendChild(li);
+        trackItemEls[index] = li;
+      });
+      updateActiveTrackInList();
+    }
+
+    function updateTrackListItem(index) {
+      const t = tracks[index];
+      const li = trackItemEls[index];
+      if (!li || !t) return;
+      li.textContent = t.title || `Трек ${index + 1}`;
+    }
+
+    function readTagsForTracks() {
+      tracks.forEach((t, index) => {
+        const fileUrl = new URL(t.file, window.location.href).href;
+        jsmediatags.read(fileUrl, {
+          onSuccess: ({ tags }) => {
+            if (tags.title)  t.title = tags.title;
+            if (tags.artist) t.artist = tags.artist;
+            if (tags.album)  t.album = tags.album;
+            const dataUrl = pictureToDataUrl(tags.picture);
+            if (dataUrl) t.coverUrl = dataUrl;
+            if (index === currentIndex) applyTrackToUI();
+            updateTrackListItem(index);
+          },
+          onError: (e) => console.warn('Ошибка тегов', t.file, e)
+        });
+      });
+    }
+
+    function updateProgressUI() {
+      const cur = audio.currentTime || 0;
+      const dur = audio.duration || 0;
+      curTimeEl.textContent = formatTime(cur);
+      durTimeEl.textContent = formatTime(dur);
+      if (isFinite(dur) && dur > 0) {
+        progressFill.style.width = (cur / dur * 100) + '%';
+      } else {
+        progressFill.style.width = '0%';
+      }
+    }
+
+    function seekBy(deltaSeconds) {
+      const dur = audio.duration;
+      if (!isFinite(dur) || dur <= 0) return;
+      let t = (audio.currentTime || 0) + deltaSeconds;
+      if (t < 0) t = 0;
+      if (t > dur) t = dur;
+      audio.currentTime = t;
+      updateProgressUI();
+      updateTimedFx();
+    }
+
+    /* ===== FX ===== */
+
+    function resetFx() {
+      shakeEnabled = false;
+      camAngleDeg = 0;
+      document.body.classList.remove(
+        'fx-track1-base', 'fx-track1-phase1', 'fx-track1-gray',
+        'fx-track2-storm'
+      );
+      glOverlayMode = 0;
+      setShaderVisible(false);
+      fxBackdrop.style.background = '';
+      camera.style.transform = 'translate(0px, 0px) scale(1) rotate(0deg)';
+    }
+
+    function enterFxPhase1() {
+      document.body.classList.add('fx-track1-phase1');
+      document.body.classList.remove('fx-track1-gray');
+      shakeEnabled = true;
+    }
+
+    function enterFxGray() {
+      document.body.classList.remove('fx-track1-phase1');
+      document.body.classList.add('fx-track1-gray');
+      shakeEnabled = false;
+    }
+
+    function enterFxStorm() {
+      document.body.classList.add('fx-track2-storm');
+    }
+
+    function updateTimedFx() {
+      const isFx1 = isFxTrack1Now();
+      const isFx2 = isFxTrack2Now();
+      const playing = !audio.paused && !audio.ended;
+      const t = audio.currentTime || 0;
+
+      // ===== ТРЕК 2: ГРОЗА =====
+      if (isFx2 && playing) {
+        enterFxStorm();
+        glOverlayMode = 5; // гроза
+        setShaderVisible(true);
+        shakeEnabled = false;
+        camAngleDeg = 0;
+        fxBackdrop.style.background = '';
+        return;
+      }
+
+      // ===== ТРЕК 1: СЛОЖНЫЙ СЦЕНАРИЙ =====
+      if (!isFx1 || !playing) {
+        resetFx();
+        return;
+      }
+
+      // ===== ТАЙМЛАЙН ЭФФЕКТОВ ДЛЯ 1.mp3 =====
+      const T1            = 16.001;
+      const T_PULSE_START = 16.3;
+      const T_GRAD_START  = 23.0;
+      const T_GRAD_ONLY   = 29.5;
+      const T_BLACK_START = 42.9;
+      const T_WHITE_START = 45.0;
+      const T_WHITE_END   = 46.2;
+      const T_GLITCH_START= 46.2;
+
+      // перевороты камеры
+      const FLIP1_START = 74.150;
+      const FLIP1_END   = 76.000;
+      const FLIP2_START = 77.500;
+      const FLIP2_END   = 79.200;
+      const FLIP3_START = 107.400;
+      const FLIP3_END   = 113.900;
+
+      // окно "тишины FX"
+      const SUPPRESS_START = 114.0;
+      const SUPPRESS_END   = 120.6;
+
+      // финальная фаза
+      const T_FINAL_WHITE_START = 190.6;
+      const T_FINAL_WHITE_END   = 191.1;
+      const T_FINAL_BLACK_START = 192.4;
+      const T_FINAL_BLACK_END   = 194.4;
+
+      // Окно полного отключения FX 1:54–2:00.6
+      if (t >= SUPPRESS_START && t < SUPPRESS_END) {
+        resetFx();
+        return;
+      }
+
+      // ===== ФИНАЛЬНАЯ ФАЗА (3:10.600+) =====
+      if (t >= T_FINAL_WHITE_START) {
+        if (!document.body.classList.contains('fx-track1-base')) {
+          document.body.classList.add('fx-track1-base');
+        }
+        enterFxGray();
+
+        glOverlayMode = 0;
+        setShaderVisible(false);
+
+        if (t < T_FINAL_WHITE_END) {
+          const k = (t - T_FINAL_WHITE_START) / (T_FINAL_WHITE_END - T_FINAL_WHITE_START);
+          const v = Math.round(255 * Math.min(Math.max(k, 0), 1));
+          fxBackdrop.style.background = `rgb(${v},${v},${v})`;
+        } else if (t < T_FINAL_BLACK_START) {
+          fxBackdrop.style.background = '#fff';
+        } else if (t < T_FINAL_BLACK_END) {
+          const k = (t - T_FINAL_BLACK_START) / (T_FINAL_BLACK_END - T_FINAL_BLACK_START);
+          const v = Math.round(255 * (1 - Math.min(Math.max(k, 0), 1)));
+          fxBackdrop.style.background = `rgb(${v},${v},${v})`;
+        } else {
+          fxBackdrop.style.background = '#000';
+        }
+
+        camAngleDeg = 0;
+        return;
+      }
+
+      // ===== ОСНОВНОЙ СЦЕНАРИЙ (до 3:10.600) =====
+
+      if (!document.body.classList.contains('fx-track1-base')) {
+        document.body.classList.add('fx-track1-base');
+      }
+
+      if (t >= T1) {
+        if (!document.body.classList.contains('fx-track1-phase1')) {
+          enterFxPhase1();
+        }
+        shakeEnabled = t < T_BLACK_START;
+      } else {
+        document.body.classList.remove('fx-track1-phase1');
+        shakeEnabled = false;
+      }
+
+      // фон через fxBackdrop
+      if (t < T_BLACK_START) {
+        fxBackdrop.style.background = '';
+      } else if (t >= T_BLACK_START && t < T_WHITE_START) {
+        fxBackdrop.style.background = '#000';
+      } else if (t >= T_WHITE_START && t < T_WHITE_END) {
+        const k = Math.min(Math.max((t - T_WHITE_START) / (T_WHITE_END - T_WHITE_START), 0), 1);
+        const v = Math.round(255 * k);
+        fxBackdrop.style.background = `rgb(${v},${v},${v})`;
+      } else if (t >= T_GLITCH_START) {
+        fxBackdrop.style.background = '#000';
+      }
+
+      // режимы WebGL-шейдера
+      if (t < T_PULSE_START) {
+        glOverlayMode = 0;
+        setShaderVisible(false);
+      } else if (t >= T_PULSE_START && t < T_GRAD_START) {
+        glOverlayMode = 1;
+        setShaderVisible(true);
+      } else if (t >= T_GRAD_START && t < T_GRAD_ONLY) {
+        glOverlayMode = 2;
+        setShaderVisible(true);
+      } else if (t >= T_GRAD_ONLY && t < T_BLACK_START) {
+        glOverlayMode = 3;
+        setShaderVisible(true);
+      } else if (t >= T_BLACK_START && t < T_GLITCH_START) {
+        glOverlayMode = 0;
+        setShaderVisible(false);
+      } else {
+        glOverlayMode = 4;
+        setShaderVisible(true);
+      }
+
+      // Базовый угол (0/180) от флипов
+      let baseAngle = 0;
+      if (
+        (t >= FLIP1_START && t < FLIP1_END) ||
+        (t >= FLIP2_START && t < FLIP2_END) ||
+        (t >= FLIP3_START && t < FLIP3_END)
+      ) {
+        baseAngle = 180;
+      }
+
+      camAngleDeg = baseAngle;
+    }
+
+    /* ===== поиск треков ===== */
+
+    async function detectTracks() {
+      const MAX_TRACKS = 50;
+      const found = [];
+
+      for (let i = 1; i <= MAX_TRACKS; i++) {
+        const filename = `${i}.mp3`;
+        try {
+          const res = await fetch(filename, { method: 'HEAD', cache: 'no-store' });
+          if (!res.ok) break;
+          found.push(filename);
+        } catch (err) {
+          break;
+        }
+      }
+
+      tracks = found.map((file, index) => ({
+        file,
+        title: 'Трек ' + (index + 1),
+        artist: '',
+        album: '',
+        coverUrl: null
+      }));
+
+      console.log('Найдено треков:', tracks.length, tracks.map(t => t.file));
+    }
+
+    /* ===== AudioContext + визуализатор ===== */
+
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let zoomScale = 1;
+    let zoomRafId = null;
+
+    async function ensureAudioAnalyser() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+      }
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      if (!analyser) {
+        const source = audioCtx.createMediaElementSource(audio);
+        analyser = new AnalyserNode(audioCtx, { fftSize: 256 });
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+      }
+    }
+
+    function startZoomLoop() {
+      if (zoomRafId) return;
+
+      const baseScale = 1;
+      const maxExtra = 0.32;
+      let envelope = 0;
+      let bassAvg = 0;
+      let prevSpectrum = null;
+
+      function tick() {
+        if (!analyser || !dataArray) {
+          zoomRafId = null;
+          camera.style.transform = 'translate(0px, 0px) scale(1) rotate(0deg)';
+          document.documentElement.style.setProperty('--beat', '0');
+          currentBeat = 0;
+          return;
+        }
+
+        analyser.getByteFrequencyData(dataArray);
+        const len = dataArray.length;
+
+        let total = 0;
+        for (let i = 0; i < len; i++) total += dataArray[i];
+        const globalLevel = (total / len) / 255;
+
+        const loudThreshold = 0.04;
+        const loudGain = 3.0;
+        let loudFactor = (globalLevel - loudThreshold) * loudGain;
+        loudFactor = Math.min(Math.max(loudFactor, 0), 1);
+
+        const bassEndCam = Math.min(20, len);
+        let bassSumCam = 0;
+        for (let i = 0; i < bassEndCam; i++) bassSumCam += dataArray[i];
+        let bassLevelCam = (bassSumCam / bassEndCam) / 255;
+
+        bassAvg += (bassLevelCam - bassAvg) * 0.02;
+        let bassPeak = bassLevelCam - bassAvg;
+        if (bassPeak < 0) bassPeak = 0;
+
+        const bassGain = 20;
+        let bassBoost = bassPeak * bassGain;
+        if (bassBoost > 1) bassBoost = 1;
+
+        let transient = 0;
+        if (prevSpectrum) {
+          let diffSum = 0;
+          for (let i = 0; i < len; i++) {
+            const diff = dataArray[i] - prevSpectrum[i];
+            if (diff > 0) diffSum += diff;
+          }
+          transient = diffSum / (len * 255);
+        }
+        if (!prevSpectrum) prevSpectrum = new Uint8Array(len);
+        prevSpectrum.set(dataArray);
+
+        const transientThreshold = 0.003;
+        const transientGain = 22;
+        let transientBoost = (transient - transientThreshold) * transientGain;
+        transientBoost = Math.min(Math.max(transientBoost, 0), 1);
+
+        let energy = bassBoost * 0.6 + transientBoost * 0.8;
+        energy = Math.min(energy, 1);
+        energy *= (0.2 + 0.8 * loudFactor);
+
+        const attackCam = 0.85;
+        const releaseCam = 0.28;
+        if (energy > envelope) {
+          envelope += (energy - envelope) * attackCam;
+        } else {
+          envelope += (energy - envelope) * releaseCam;
+        }
+
+        const targetScale = baseScale + envelope * maxExtra;
+        zoomScale += (targetScale - zoomScale) * 0.55;
+
+        // базовая тряска
+        let baseShakeAmp = shakeEnabled ? 10 : 0;
+
+        // жёсткая тряска только при костяном глитче
+        let glitchShakeAmp = 0;
+        if (!disableCameraFx && glOverlayMode === 4) {
+          glitchShakeAmp = 25;
+        }
+
+        let totalAmp = baseShakeAmp + glitchShakeAmp;
+
+        const shakeAmp = (!disableCameraFx)
+          ? (isMobilePortrait ? totalAmp * 0.4 : totalAmp)
+          : 0;
+
+        const shakeX = shakeAmp ? (Math.random() - 0.5) * 2 * shakeAmp : 0;
+        const shakeY = shakeAmp ? (Math.random() - 0.5) * 2 * shakeAmp : 0;
+
+        const mobileScale = isMobilePortrait
+          ? 1 + (zoomScale - 1) * 0.45
+          : zoomScale;
+
+        const scaleValue = disableCameraFx ? 1 : mobileScale;
+
+        camera.style.transform =
+          `translate(${shakeX}px, ${shakeY}px) scale(${scaleValue}) rotate(${camAngleDeg}deg)`;
+
+        document.documentElement.style.setProperty('--beat', envelope.toFixed(3));
+        currentBeat = envelope;
+
+        const halfBars = CENTER_BAR + 1;
+        const binsPerHalf = Math.floor(len / halfBars) || 1;
+
+        for (let h = 0; h < halfBars; h++) {
+          let startBin = h * binsPerHalf;
+          if (startBin >= len) break;
+          let endBin = Math.min(len, startBin + binsPerHalf);
+
+          let sumBand = 0;
+          for (let j = startBin; j < endBin; j++) sumBand += dataArray[j];
+          let bandLevel = (sumBand / (endBin - startBin || 1)) / 255;
+
+          let val = bandLevel * 0.6 + globalLevel * 0.4;
+          val = Math.min(Math.max(val, 0), 1);
+          val = Math.pow(val, 0.9);
+
+          const leftIndex = CENTER_BAR - h;
+          const rightIndex = CENTER_BAR + h;
+          const minScale = 0.03;
+          const maxScale = 8.0;
+
+          [leftIndex, rightIndex].forEach(idx => {
+            if (idx < 0 || idx >= VIS_BARS || disableVisualizer) return;
+            const s = minScale + val * maxScale;
+            barElems[idx].style.transform = `scaleY(${s})`;
+          });
+        }
+
+        zoomRafId = requestAnimationFrame(tick);
+      }
+
+      zoomRafId = requestAnimationFrame(tick);
+    }
+
+    function stopZoomLoop() {
+      if (zoomRafId) {
+        cancelAnimationFrame(zoomRafId);
+        zoomRafId = null;
+      }
+      zoomScale = 1;
+      camAngleDeg = 0;
+      camera.style.transform = 'translate(0px, 0px) scale(1) rotate(0deg)';
+      document.documentElement.style.setProperty('--beat', '0');
+      currentBeat = 0;
+    }
+
+    /* ===== WebGL ===== */
+
+    let glCanvas = null;
+    let gl = null;
+    let glProgram = null;
+    let glBuffer = null;
+    let glAttribPos = null;
+    let glUniformResolution = null;
+    let glUniformTime = null;
+    let glUniformBeat = null;
+    let glUniformFxMode = null;
+    let glStartTime = null;
+    let glReady = false;
+    let glLoopId = null;
+
+    const VERT_SRC = `
+      attribute vec2 aPosition;
+      varying vec2 vUv;
+      void main() {
+        vUv = aPosition * 0.5 + 0.5;
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+      }
+    `;
+
+    const FRAG_SRC = `
+      precision mediump float;
+      varying vec2 vUv;
+      uniform vec2 uResolution;
+      uniform float uTime;
+      uniform float uBeat;
+      uniform int uFxMode;
+
+      // uFxMode:
+      // 0 — выкл
+      // 1 — ECG-пульс
+      // 2 — ECG-пульс + градиенты
+      // 3 — только градиенты
+      // 4 — костяной глитч
+      // 5 — гроза (облака + молнии)
+
+      float hash1(vec2 p) {
+        p = fract(p * vec2(123.34, 345.45));
+        p += dot(p, p + 34.345);
+        return fract(p.x * p.y);
+      }
+
+      float noise1(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        float a = hash1(i);
+        float b = hash1(i + vec2(1.0, 0.0));
+        float c = hash1(i + vec2(0.0, 1.0));
+        float d = hash1(i + vec2(1.0, 1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(a, b, u.x) +
+               (c - a) * u.y * (1.0 - u.x) +
+               (d - b) * u.x * u.y;
+      }
+
+      float ecg(float x) {
+        float t = fract(x);
+        float signal = 0.0;
+        signal += 0.6  * exp(-pow((t - 0.3)  * 40.0, 2.0));
+        signal -= 0.35 * exp(-pow((t - 0.36) * 35.0, 2.0));
+        return signal;
+      }
+
+      float hash2(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+      }
+
+      float glitchLine2(vec2 uv, float t) {
+        float line = step(0.98, hash2(vec2(floor(uv.y * 50.0), floor(t * 20.0))));
+        return line * hash2(vec2(floor(t * 100.0), 1.0));
+      }
+
+      vec2 distort2(vec2 uv, float t) {
+        float glitch = step(0.9, sin(t * 30.0 + uv.y * 10.0));
+        float offset = hash2(vec2(floor(uv.y * 20.0), floor(t * 15.0))) * 0.1;
+        uv.x += glitch * offset * sign(sin(t * 50.0));
+        return uv;
+      }
+
+      float bone2(vec2 uv, vec2 pos, float h) {
+        vec2 d = abs(uv - pos) - vec2(0.015, h);
+        return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+      }
+
+      // ===== ГРОЗА: fbm для облаков =====
+
+      float noise2D(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        float a = hash2(i);
+        float b = hash2(i + vec2(1.0, 0.0));
+        float c = hash2(i + vec2(0.0, 1.0));
+        float d = hash2(i + vec2(1.0, 1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+      }
+
+      float fbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.5;
+        for (int i = 0; i < 5; i++) {
+          v += a * noise2D(p);
+          p *= 2.0;
+          a *= 0.5;
+        }
+        return v;
+      }
+
+      void main() {
+        // ===== MODE 5: ГРОЗА =====
+        if (uFxMode == 5) {
+          vec2 uv = gl_FragCoord.xy / uResolution.xy;
+          vec2 p  = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+
+          float time = uTime;
+
+          // облака, двигающиеся влево
+          vec2 move1 = vec2(time * 0.03, 0.0);
+          vec2 move2 = vec2(time * 0.06, 0.0);
+
+          float c1 = fbm(p * 1.4 + move1);
+          float c2 = fbm(p * 3.0 + move2);
+
+          float cloudsBase = c1 * 0.7 + c2 * 0.5;
+          float clouds = smoothstep(0.35, 0.8, cloudsBase);
+
+          // вертикальный градиент
+          float h = clamp(p.y * 0.5 + 0.5, 0.0, 1.0);
+
+          // палитра
+          vec3 colDark  = vec3(0.06, 0.08, 0.11);
+          vec3 colMid   = vec3(0.18, 0.22, 0.28);
+          vec3 colLight = vec3(0.55, 0.60, 0.67);
+          vec3 colHigh  = vec3(0.90, 0.93, 0.96);
+
+          vec3 sky = mix(colDark, colMid, h);
+
+          vec3 cloudBody = mix(colMid, colLight, clouds);
+          float topHighlight = smoothstep(0.4, 1.0, clouds);
+          vec3 cloudTop = mix(cloudBody, colHigh, topHighlight * 0.7);
+
+          vec3 col = mix(sky, cloudTop, clouds);
+
+          // небольшой объём за счёт разницы слоёв
+          col += (c2 - c1) * 0.18 * vec3(0.2, 0.24, 0.30);
+
+          // ---- гроза / глобальная вспышка ----
+
+          float t  = time * 0.35;
+          float ti = floor(t);
+          float tf = fract(t);
+
+          // решаем, будет ли молния в этом тике
+          float rnd = fract(sin(ti * 17.13) * 43758.5453);
+          float stormOn = step(0.82, rnd);
+
+          // две короткие вспышки внутри события
+          float a1 = (tf - 0.20) * 18.0;
+          float a2 = (tf - 0.45) * 20.0;
+          float f1 = exp(-a1 * a1);
+          float f2 = exp(-a2 * a2);
+          float flash = stormOn * (f1 + 0.7 * f2);
+
+          // глобальное осветление неба
+          col = mix(col, vec3(0.90, 0.95, 1.00), flash * 0.7);
+
+          // ---- молния (болт) ----
+
+          float rndPos = fract(sin((ti + 3.0) * 41.7) * 951.73);
+          float boltCenter = mix(0.15, 0.85, rndPos);
+
+          // зубчатость по высоте
+          float jag = (noise2D(vec2(uv.y * 12.0, ti * 1.3)) - 0.5) * 0.06;
+
+          float x = uv.x;
+          float y = uv.y;
+
+          float dx = (x - (boltCenter + jag)) * 60.0;
+          float core = exp(-dx * dx);
+
+          // только верхняя часть экрана
+          float verticalMask = smoothstep(0.30, 0.9, y) * (1.0 - smoothstep(0.9, 1.02, y));
+          float bolt = flash * core * verticalMask;
+
+          // яркое холодное свечение молнии
+          col += vec3(1.3, 1.4, 1.5) * bolt;
+          col = mix(col, vec3(0.98, 0.99, 1.0), bolt * 0.8);
+
+          gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+          return;
+        }
+
+        // ===== MODE 4: КОСТЯНОЙ ГЛИТЧ =====
+        if (uFxMode == 4) {
+          vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+          float t = uTime;
+
+          float beat = pow(sin(t * 12.0) * 0.5 + 0.5, 3.0);
+          float hardBeat = step(0.92, sin(t * 6.0));
+          float fastPulse = pow(sin(t * 20.0) * 0.5 + 0.5, 2.0);
+
+          vec2 distUv = distort2(uv, t);
+          float glitch = glitchLine2(uv, t);
+
+          vec3 bg = vec3(0.05, 0.0, 0.0);
+          bg += vec3(0.15, 0.02, 0.03) * beat;
+          bg += vec3(0.1, 0.0, 0.0) * fastPulse;
+
+          float scanline = sin(uv.y * 500.0 + t * 15.0) * 0.5 + 0.5;
+          bg *= 0.85 + 0.15 * scanline;
+
+          float dist = length(uv);
+          float radialPulse = sin(dist * 25.0 - t * 20.0);
+          float energy = smoothstep(0.5, 0.0, dist) * radialPulse * 0.4;
+
+          vec3 col = bg;
+          col += vec3(1.0, 0.15, 0.05) * energy * (1.0 + beat * 1.5);
+
+          for (int i = 0; i < 8; i++) {
+            float fi = float(i);
+            float speed = 3.0 + fi * 0.7;
+            float xPos = sin(fi * 2.0 + t * 1.2) * 0.7;
+            float yPos = mod(t * speed + fi * 0.3, 2.0) - 1.0;
+            float b = bone2(distUv, vec2(xPos, yPos), 0.1);
+            col += vec3(0.95, 0.9, 0.85) * smoothstep(0.01, 0.0, b) * 0.9;
+          }
+
+          for (int i = 0; i < 4; i++) {
+            float fi = float(i);
+            float speed = 4.0 + fi * 0.5;
+            float yPos = sin(fi * 1.8 + t * 0.9) * 0.5;
+            float xPos = mod(t * speed + fi * 0.5, 2.0) - 1.0;
+            float b = bone2(distUv.yx, vec2(yPos, xPos), 0.06);
+            col += vec3(0.9, 0.85, 0.8) * smoothstep(0.01, 0.0, b) * 0.7;
+          }
+
+          col.r += glitch * 0.7;
+          col.b -= glitch * 0.4;
+          col += vec3(0.5, 0.08, 0.03) * hardBeat;
+
+          float n = hash2(uv + t) * 0.12;
+          col += n * vec3(0.6, 0.1, 0.1);
+
+          float vignette = 1.0 - dot(uv * (0.7 + beat * 0.2), uv * (0.7 + beat * 0.2));
+          col *= pow(vignette, 1.3);
+
+          col.r = pow(col.r, 0.85);
+          col.gb *= 0.6;
+          col = pow(col, vec3(1.15));
+
+          gl_FragColor = vec4(col, 1.0);
+          return;
+        }
+
+        // ===== MODE 0: ВЫКЛ =====
+        if (uFxMode == 0) {
+          gl_FragColor = vec4(0.0);
+          return;
+        }
+
+        vec3 color = vec3(0.0);
+        float alpha = 0.0;
+        float t = uTime;
+
+        // ===== MODE 1, 2: ECG-ПУЛЬС =====
+        if (uFxMode == 1 || uFxMode == 2) {
+          vec2 uv = gl_FragCoord.xy / uResolution.xy;
+
+          float y = uv.y - 0.5;
+
+          float cycle = 2.5;
+          float progress = mod(t, cycle) / cycle;
+          float head = progress * 1.3;
+
+          float fade = smoothstep(head - 0.4, head - 0.05, uv.x)
+                     * smoothstep(head + 0.01, head, uv.x);
+
+          float x = uv.x * 2.0;
+          float signal = ecg(x) * 0.25;
+
+          float dx = 0.001;
+          float derivative = (ecg((uv.x + dx) * 2.0) - ecg((uv.x - dx) * 2.0))
+                             * 0.25 / (2.0 * dx);
+          float thickness = 0.008 / sqrt(1.0 + derivative * derivative);
+
+          float dist = abs(y - signal);
+
+          float line = smoothstep(thickness, 0.0, dist);
+          float glow = exp(-dist * 50.0) * 0.4;
+
+          float intensity = (line + glow) * fade;
+
+          vec3 pulseColor = vec3(1.0, 0.1, 0.1);
+          color += pulseColor * intensity;
+
+          alpha += intensity * 0.35;
+        }
+
+        // ===== MODE 2, 3: ГРАДИЕНТЫ =====
+        if (uFxMode == 2 || uFxMode == 3) {
+          vec2 uv2 = vUv;
+
+          float topMask = 1.0 - smoothstep(0.0, 0.5, uv2.y);
+          float bottomMask = 1.0 - smoothstep(0.0, 0.5, 1.0 - uv2.y);
+          float gradMask = max(topMask, bottomMask);
+
+          float n = noise1(uv2 * 6.0 + vec2(t * 1.7, -t * 1.1));
+          gradMask *= (0.7 + 0.3 * n);
+
+          float flicker = 0.65 + 0.35 * sin(t * 12.0 + n * 6.0);
+          float beatBoost = 0.8 + 0.4 * uBeat;
+
+          vec3 gradColor = vec3(1.0, 0.2, 0.2);
+          gradColor *= flicker * beatBoost;
+
+          color += gradColor * gradMask;
+          alpha += gradMask * 0.25 * flicker * beatBoost;
+        }
+
+        alpha = clamp(alpha, 0.0, 1.0);
+        color = clamp(color, 0.0, 1.0);
+        gl_FragColor = vec4(color, alpha);
+      }
+    `;
+
+    function createShader(gl, type, src) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, src);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    function createProgram(gl, vsSrc, fsSrc) {
+      const vs = createShader(gl, gl.VERTEX_SHADER, vsSrc);
+      const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSrc);
+      if (!vs || !fs) return null;
+      const prog = gl.createProgram();
+      gl.attachShader(prog, vs);
+      gl.attachShader(prog, fs);
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        console.error('Program link error:', gl.getProgramInfoLog(prog));
+        gl.deleteProgram(prog);
+        return null;
+      }
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return prog;
+    }
+
+    function resizeGlCanvas() {
+      if (!gl || !glCanvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = Math.round(glCanvas.clientWidth * dpr);
+      const displayHeight = Math.round(glCanvas.clientHeight * dpr);
+      if (glCanvas.width !== displayWidth || glCanvas.height !== displayHeight) {
+        glCanvas.width = displayWidth;
+        glCanvas.height = displayHeight;
+        gl.viewport(0, 0, displayWidth, displayHeight);
+      }
+    }
+
+    function drawGlFrame(timeSec) {
+      if (!glReady) return;
+      resizeGlCanvas();
+
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(glProgram);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
+      gl.enableVertexAttribArray(glAttribPos);
+      gl.vertexAttribPointer(glAttribPos, 2, gl.FLOAT, false, 0, 0);
+
+      gl.uniform2f(glUniformResolution, glCanvas.width, glCanvas.height);
+      gl.uniform1f(glUniformTime, timeSec);
+      gl.uniform1f(glUniformBeat, currentBeat);
+      gl.uniform1i(glUniformFxMode, glOverlayMode);
+
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+
+    function glLoop() {
+      if (!glReady) return;
+      glLoopId = requestAnimationFrame(glLoop);
+      const now = performance.now();
+      if (glStartTime == null) glStartTime = now;
+      const t = (now - glStartTime) / 1000;
+      drawGlFrame(t);
+    }
+
+    function initWebGL() {
+      glCanvas = document.getElementById('gl-canvas');
+      if (!glCanvas) return;
+
+      gl = glCanvas.getContext('webgl', {
+        antialias: true,
+        alpha: true,
+        premultipliedAlpha: true
+      });
+      if (!gl) {
+        console.warn('WebGL не поддерживается.');
+        return;
+      }
+
+      glProgram = createProgram(gl, VERT_SRC, FRAG_SRC);
+      if (!glProgram) return;
+
+      glAttribPos = gl.getAttribLocation(glProgram, 'aPosition');
+      glUniformResolution = gl.getUniformLocation(glProgram, 'uResolution');
+      glUniformTime = gl.getUniformLocation(glProgram, 'uTime');
+      glUniformBeat = gl.getUniformLocation(glProgram, 'uBeat');
+      glUniformFxMode = gl.getUniformLocation(glProgram, 'uFxMode');
+
+      glBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
+      const verts = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
+      gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+
+      gl.clearColor(0, 0, 0, 0);
+      glReady = true;
+      glStartTime = null;
+
+      window.addEventListener('resize', resizeGlCanvas);
+      resizeGlCanvas();
+      glLoop();
+    }
+
+    function setShaderVisible(visible) {
+      document.body.classList.toggle('gl-shader-active', !!visible);
+    }
+    window.setShaderVisible = setShaderVisible;
+
+    // чекбоксы
+    showMsCheckbox.addEventListener('change', () => {
+      showMs = showMsCheckbox.checked;
+      updateProgressUI();
+    });
+
+    disableCamCheckbox.addEventListener('change', () => {
+      disableCameraFx = disableCamCheckbox.checked;
+      if (disableCameraFx) {
+        camera.style.transform = 'translate(0px, 0px) scale(1) rotate(0deg)';
+        shakeEnabled = false;
+      }
+    });
+
+    disableVisCheckbox.addEventListener('change', () => {
+      disableVisualizer = disableVisCheckbox.checked;
+      if (disableVisualizer) {
+        visualizer.classList.remove('active');
+      } else if (!audio.paused && !audio.ended) {
+        visualizer.classList.add('active');
+      }
+    });
+
+    // меню треков
+    let menuHoverCount = 0;
+    let closeTimer = null;
+
+    function openMenu() { trackMenu.classList.add('open'); }
+    function scheduleCloseMenu() {
+      if (closeTimer) return;
+      closeTimer = setTimeout(() => {
+        if (menuHoverCount === 0) trackMenu.classList.remove('open');
+        closeTimer = null;
+      }, 80);
+    }
+    function cancelCloseMenu() {
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    }
+
+    [trackMenuToggle, trackMenuPanel].forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        menuHoverCount++;
+        cancelCloseMenu();
+        openMenu();
+      });
+      el.addEventListener('mouseleave', () => {
+        menuHoverCount = Math.max(menuHoverCount - 1, 0);
+        if (menuHoverCount === 0) scheduleCloseMenu();
+      });
+    });
+
+    trackMenuToggle.addEventListener('click', () => {
+      trackMenu.classList.toggle('open');
+    });
+
+    // управление плеером
+    function togglePlay() {
+      if (audio.paused) audio.play();
+      else audio.pause();
+    }
+
+    playBtn.addEventListener('click', togglePlay);
+    coverWrap.addEventListener('click', togglePlay);
+    prevBtn.addEventListener('click', () => selectTrack(currentIndex - 1, true));
+    nextBtn.addEventListener('click', () => selectTrack(currentIndex + 1, true));
+
+    progressBar.addEventListener('click', (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      const dur = audio.duration;
+      if (isFinite(dur) && dur > 0) {
+        const clamped = Math.max(0, Math.min(1, ratio));
+        audio.currentTime = dur * clamped;
+        updateProgressUI();
+        updateTimedFx();
+      }
+    });
+
+    // клавиатура
+    document.addEventListener('keydown', (e) => {
+      const tag = e.target.tagName;
+      if (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        e.target.isContentEditable
+      ) return;
+
+      switch (e.code) {
+        case 'Space':
+        case 'KeyK':
+          e.preventDefault();
+          togglePlay();
+          break;
+        case 'ArrowRight':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            selectTrack(currentIndex + 1, true);
+          } else {
+            seekBy(5);
+          }
+          break;
+        case 'ArrowLeft':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            selectTrack(currentIndex - 1, true);
+          } else {
+            seekBy(-5);
+          }
+          break;
+        case 'KeyN':
+          e.preventDefault();
+          selectTrack(currentIndex + 1, true);
+          break;
+        case 'KeyP':
+          e.preventDefault();
+          selectTrack(currentIndex - 1, true);
+          break;
+      }
+    });
+
+    // события audio
+    audio.addEventListener('loadedmetadata', () => {
+      durTimeEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      updateProgressUI();
+      updateTimedFx();
+    });
+
+    audio.addEventListener('play', async () => {
+      playBtn.textContent = PAUSE_ICON;
+      if (!disableVisualizer) visualizer.classList.add('active');
+
+      updateTimedFx();
+
+      await ensureAudioAnalyser();
+      startZoomLoop();
+    });
+
+    audio.addEventListener('pause', () => {
+      playBtn.textContent = PLAY_ICON;
+      visualizer.classList.remove('active');
+      stopZoomLoop();
+      resetFx();
+    });
+
+    audio.addEventListener('ended', () => {
+      playBtn.textContent = PLAY_ICON;
+      visualizer.classList.remove('active');
+      stopZoomLoop();
+      resetFx();
+      selectTrack(currentIndex + 1, true);
+    });
+
+    // инициализация
+    async function detectTracks() {
+      const MAX_TRACKS = 50;
+      const found = [];
+      for (let i = 1; i <= MAX_TRACKS; i++) {
+        const filename = `${i}.mp3`;
+        try {
+          const res = await fetch(filename, { method: 'HEAD', cache: 'no-store' });
+          if (!res.ok) break;
+          found.push(filename);
+        } catch {
+          break;
+        }
+      }
+      tracks = found.map((file, index) => ({
+        file,
+        title: 'Трек ' + (index + 1),
+        artist: '',
+        album: '',
+        coverUrl: null
+      }));
+      console.log('Найдено треков:', tracks.length, tracks.map(t => t.file));
+    }
+
+    (async () => {
+      initWebGL();
+      await detectTracks();
+      if (!tracks.length) {
+        console.warn('Треки 1.mp3..N не найдены.');
+        return;
+      }
+      buildTrackList();
+      readTagsForTracks();
+      selectTrack(0, false);
+    })();
+  </script>
+</body>
+</html>

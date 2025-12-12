@@ -1,0 +1,19 @@
+[
+  {
+    "id": "dmk-ost",
+    "date": "2025-31-12",
+    "dateLabel": "31.12.2025",
+    "title": "Догони меня, кирпич! OST",
+    "text": "Отменённые саундтреки для отменённой игры. Клик по новости открывает страницу с OST.",
+    "clickable": true,
+    "url": "DMKOST/DMKOST.html"
+  },
+  {
+    "id": "site-launch",
+    "date": "2025-12-12",
+    "dateLabel": "12.12.2025",
+    "title": "Запущен сайт Koleso333.ru",
+    "text": "Круто, да? Теперь это мой сайт",
+    "clickable": false
+  }
+]

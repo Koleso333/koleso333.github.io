@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Koleso Dev"
+  },
+  "brand": {
+    "heroTitle": "Koleso",
+    "subtitle": "Здесь можно скачать мою игрушку или что то посмотреть!"
+  },
+  "nav": [
+    { "id": "about",    "label": "Обо мне" },
+    { "id": "games",    "label": "Игры" },
+    { "id": "news",     "label": "Саундтреки" },
+    { "id": "news",     "label": "Новости" },
+    { "id": "contacts", "label": "Контакты" }
+  ],
+  "sections": {
+    "about": {
+      "title": "Обо мне",
+      "html": "Меня зовут <strong>Колесо</strong>. Я начинающий разработчик игр, люблю что‑либо создавать и экспериментировать. Этот сайт считай тоже эксперимент."
+    },
+    "games": {
+      "title": "Игры",
+      "text": "Здесь будут мои игры. Позже я добавлю сюда карточки с описаниями и ссылками."
+    },
+    "contacts": {
+      "title": "Контакты"
+    }
+  },
+  "contacts": [
+    {
+      "label": "Telegram",
+      "href": "https://t.me/Kolesobesspic",
+      "text": "@Kolesobesspic"
+    },
+    {
+      "label": "Email",
+      "href": "mailto:kravchenko6602400@gmail.com",
+      "text": "kravchenko6602400@gmail.com"
+    }
+  ]
+}

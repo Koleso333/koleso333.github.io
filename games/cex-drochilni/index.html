@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Игра — Koleso</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- общий стиль из корня -->
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="game-page">
+<main class="game-page-main">
+    <header class="game-hero" id="game-hero">
+        <div class="game-hero-inner">
+            <img id="game-logo" class="game-logo" src="logo.png" alt="">
+            <div class="game-hero-text">
+                <h1 id="game-title" class="game-page-title">Название игры</h1>
+                <p id="game-description" class="game-page-description">
+                    Описание игры.
+                </p>
+            </div>
+        </div>
+
+        <!-- Год игры (справа снизу баннера) -->
+        <span class="game-year-tag" id="game-year-tag"></span>
+    </header>
+
+    <!-- Скриншоты: горизонтальная полоса + стрелки -->
+    <section class="game-section" id="game-screens-section">
+        <h2 class="game-section-title">Скриншоты</h2>
+
+        <div class="game-screens-wrapper" id="game-screens-wrapper">
+            <button class="screen-nav screen-nav--left" id="screen-prev" aria-label="Предыдущий скриншот">‹</button>
+
+            <div class="game-screens" id="game-screens"></div>
+
+            <button class="screen-nav screen-nav--right" id="screen-next" aria-label="Следующий скриншот">›</button>
+
+            <div class="game-screens-gradient game-screens-gradient--left"></div>
+            <div class="game-screens-gradient game-screens-gradient--right"></div>
+        </div>
+    </section>
+
+    <!-- Скачивания -->
+    <section class="game-section" id="game-downloads-section">
+        <h2 class="game-section-title">Скачать</h2>
+        <div class="game-downloads" id="game-downloads"></div>
+    </section>
+</main>
+
+<!-- Вьюер скриншотов -->
+<div class="screenshot-viewer" id="screenshot-viewer">
+    <div class="screenshot-viewer-inner">
+        <button class="screenshot-viewer-close" id="screenshot-viewer-close" aria-label="Закрыть">×</button>
+        <img src="" alt="" class="screenshot-viewer-img" id="screenshot-viewer-img">
+    </div>
+</div>
+
+<script>
+    (async function () {
+        const hero           = document.getElementById('game-hero');
+        const logoImg        = document.getElementById('game-logo');
+        const titleEl        = document.getElementById('game-title');
+        const descrEl        = document.getElementById('game-description');
+        const yearTag        = document.getElementById('game-year-tag');
+
+        const screensSection = document.getElementById('game-screens-section');
+        const screensWrapper = document.getElementById('game-screens-wrapper');
+        const screens        = document.getElementById('game-screens');
+        const prevBtn        = document.getElementById('screen-prev');
+        const nextBtn        = document.getElementById('screen-next');
+        const gradLeft       = document.querySelector('.game-screens-gradient--left');
+        const gradRight      = document.querySelector('.game-screens-gradient--right');
+
+        const downloads        = document.getElementById('game-downloads');
+        const downloadsSection = document.getElementById('game-downloads-section');
+
+        // Вьюер скриншотов
+        const viewer      = document.getElementById('screenshot-viewer');
+        const viewerImg   = document.getElementById('screenshot-viewer-img');
+        const viewerClose = document.getElementById('screenshot-viewer-close');
+
+        let isZoomed = false;
+        let currentSlide = 0;
+        let slidesCount  = 0;
+
+        function applyZoom() {
+            const scale = isZoomed ? 1.7 : 1;
+            if (viewerImg) {
+                viewerImg.style.transform = `scale(${scale})`;
+                viewerImg.classList.toggle('zoomed', isZoomed);
+            }
+        }
+
+        function openViewer(src, alt) {
+            if (!viewer || !viewerImg) return;
+            viewerImg.src = src;
+            viewerImg.alt = alt || '';
+            isZoomed = false;
+            applyZoom();
+            viewer.classList.add('viewer--open');
+        }
+
+        function closeViewer() {
+            if (!viewer) return;
+            viewer.classList.remove('viewer--open');
+        }
+
+        function updateScreens() {
+            if (!screensWrapper || !screens) return;
+            const width = screensWrapper.clientWidth;
+            screens.style.transform = `translateX(-${currentSlide * width}px)`;
+
+            if (prevBtn) {
+                prevBtn.classList.toggle('screen-nav--disabled', currentSlide === 0);
+            }
+            if (nextBtn) {
+                nextBtn.classList.toggle('screen-nav--disabled', currentSlide >= slidesCount - 1);
+            }
+        }
+
+        // Обработчики вьюера
+        if (viewer && viewerClose) {
+            viewerClose.addEventListener('click', closeViewer);
+
+            viewer.addEventListener('click', (e) => {
+                if (e.target === viewer) {
+                    closeViewer();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeViewer();
+                }
+            });
+        }
+
+        if (viewerImg) {
+            viewerImg.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isZoomed = !isZoomed;
+                applyZoom();
+            });
+        }
+
+        // Открытие вьюера по клику на миниатюру
+        if (screens) {
+            screens.addEventListener('click', (e) => {
+                const img = e.target.closest('img');
+                if (!img) return;
+                openViewer(img.src, img.alt);
+            });
+        }
+
+        // Стрелки скриншотов
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateScreens();
+                }
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < slidesCount - 1) {
+                    currentSlide++;
+                    updateScreens();
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if (slidesCount > 1) {
+                updateScreens();
+            }
+        });
+
+        // ===== Загрузка данных игры из infogame.json =====
+        try {
+            const res = await fetch('infogame.json');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+
+            const title = data.title || 'Игра';
+            document.title = title + ' — Koleso';
+
+            // Год игры (Только для баннера, не для кнопок)
+            const gameYear = (data.year !== undefined && data.year !== null)
+                ? String(data.year)
+                : null;
+
+            // Баннер
+            if (hero && data.banner) {
+                hero.style.backgroundImage = `url('${data.banner}')`;
+            }
+
+            // Год в правом нижнем углу баннера
+            if (yearTag) {
+                if (gameYear) {
+                    yearTag.textContent = gameYear;
+                    yearTag.style.display = 'block';
+                } else {
+                    yearTag.style.display = 'none';
+                }
+            }
+
+            // Лого
+            if (logoImg) {
+                logoImg.src = data.logo || 'logo.png';
+                logoImg.alt = title;
+            }
+
+            // Заголовок
+            if (titleEl) titleEl.textContent = title;
+
+            // Описание
+            if (descrEl) {
+                if (data.descriptionHtml) descrEl.innerHTML = data.descriptionHtml;
+                else if (data.description) descrEl.textContent = data.description;
+            }
+
+            // Скриншоты (горизонтальная карусель)
+            if (screens && Array.isArray(data.screenshots) && data.screenshots.length) {
+                slidesCount = data.screenshots.length;
+
+                data.screenshots.forEach(path => {
+                    const img = document.createElement('img');
+                    img.src = path;
+                    img.alt = title;
+                    screens.appendChild(img);
+                });
+
+                if (slidesCount <= 1) {
+                    if (prevBtn)  prevBtn.style.display  = 'none';
+                    if (nextBtn)  nextBtn.style.display  = 'none';
+                    if (gradLeft) gradLeft.style.display = 'none';
+                    if (gradRight)gradRight.style.display= 'none';
+                } else {
+                    updateScreens();
+                }
+            } else if (screensSection) {
+                screensSection.style.display = 'none';
+            }
+
+            // Кнопки скачивания
+            if (downloads && Array.isArray(data.downloads) && data.downloads.length) {
+                data.downloads.forEach(d => {
+                    const a = document.createElement('a');
+                    a.href = d.url || '#';
+                    a.target = '_blank';
+                    a.className = 'download-button ' +
+                        (d.style === 'green' ? 'download-button--green' : 'download-button--white');
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'download-button-label';
+                    labelSpan.textContent = d.label || 'Скачать';
+                    a.appendChild(labelSpan);
+
+                    if (d.version) {
+                        const verSpan = document.createElement('span');
+                        verSpan.className = 'download-button-version';
+                        verSpan.textContent = d.version;
+                        a.appendChild(verSpan);
+                    }
+
+                    // Год только с кнопки (d.year). Если его нет, вообще не показываем.
+                    const buttonYear = (d.year !== undefined && d.year !== null)
+                        ? String(d.year)
+                        : null;
+
+                    if (buttonYear) {
+                        const yearSpan = document.createElement('span');
+                        yearSpan.className = 'download-button-year';
+                        yearSpan.textContent = buttonYear;
+                        a.appendChild(yearSpan);
+                    }
+
+                    downloads.appendChild(a);
+                });
+            } else if (downloadsSection) {
+                downloadsSection.style.display = 'none';
+            }
+        } catch (err) {
+            console.error('Ошибка загрузки infogame.json:', err);
+        }
+    })();
+</script>
+</body>
+</html>
