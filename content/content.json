@@ -9,7 +9,6 @@
   "nav": [
     { "id": "about",    "label": "Обо мне" },
     { "id": "games",    "label": "Игры" },
-    { "id": "news",     "label": "Саундтреки" },
     { "id": "news",     "label": "Новости" },
     { "id": "contacts", "label": "Контакты" }
   ],
