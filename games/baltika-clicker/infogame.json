@@ -1,0 +1,28 @@
+{
+  "id": "baltika-clicker",
+  "title": "Балтика Кликер Alpha",
+  "year": 2025,
+  "description": "Закликай балтику и стань пиво-бароном! Создано на Godot.",
+  "banner": "banner.png",
+  "logo": "logo.png",
+  "screenshots": [
+    "screenshot-1.png",
+	"screenshot-2.png"
+  ],
+  "downloads": [
+    {
+      "label": "Скачать .exe",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/baltika-clicker/baltika-clicker-win-v1.1-alpha-release.exe",
+      "version": "v1.1",
+      "year": 2025,
+      "style": "green"
+    },
+    {
+      "label": "Скачать .apk",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/baltika-clicker/baltika-clicker-android-v1.0-alpha-release.apk",
+      "version": "v1.0",
+      "year": 2025,
+      "style": "green"
+    }
+  ]
+}
