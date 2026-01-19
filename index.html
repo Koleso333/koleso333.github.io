@@ -6,10 +6,127 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ===== ЗАГРУЗЧИК / ЧЁРНЫЙ ЭКРАН ===== */
+
+        /* Прячем основной контент, пока body.loading */
+        body.loading .site-header,
+        body.loading .page,
+        body.loading .footer {
+            visibility: hidden;
+        }
+
+        /* Чёрный экран / лоадер поверх всего */
+        .app-loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        /* Когда загрузились данные — прячем лоадер */
+        body:not(.loading) .app-loader {
+            display: none;
+        }
+
+        .loader-error {
+            max-width: 420px;
+            line-height: 1.4;
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        /* ===== ПЕРЕКЛЮЧАТЕЛЬ 18+ ДЛЯ ИГР ===== */
+
+        .games-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .games-adult-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 13px;
+            opacity: 0.85;
+            white-space: nowrap;
+        }
+
+        .games-adult-label {
+            user-select: none;
+        }
+
+        /* Базовый переключатель */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #666;
+            transition: 0.2s;
+            border-radius: 999px;
+        }
+
+        .switch-slider::before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            top: 2px;
+            background-color: #fff;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
+
+        .switch input:checked + .switch-slider {
+            background-color: #e53935; /* красный, 18+ */
+        }
+
+        .switch input:checked + .switch-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* Скрытые 18+ игры */
+        .game-card--hidden-adult {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .games-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body class="loading">
 <!-- Чёрный экран до загрузки JSON -->
-<div id="app-loader" class="app-loader"></div>
+<div id="app-loader" class="app-loader">
+    Загрузка...
+</div>
 
 <header class="site-header" id="top">
     <div class="header-inner">
@@ -40,20 +157,26 @@
 
     <!-- ОБО МНЕ -->
     <section id="about" class="section card observe" data-section>
-        <h2 class="section-title" id="about-title">Обо мне</h2>
-        <p class="section-text" id="about-text">
-            Меня зовут <strong>Колесо</strong>. Я начинающий разработчик игр, люблю что‑либо создавать
-            и экспериментировать. Этот сайт — моя небольшая визитка и точка входа
-            ко всем проектам: играм, саундтрекам и другим штукам.
-        </p>
+        <h2 class="section-title" id="about-title"></h2>
+        <p class="section-text" id="about-text"></p>
     </section>
 
     <!-- ИГРЫ -->
     <section id="games" class="section card observe" data-section>
-        <h2 class="section-title" id="games-title">Игры</h2>
-        <p class="section-text" id="games-text">
-            Здесь будут мои игры. Позже я добавлю сюда карточки с описаниями и ссылками.
-        </p>
+        <div class="games-header">
+            <h2 class="section-title" id="games-title"></h2>
+
+            <!-- переключатель 18+ справа от заголовка -->
+            <div class="games-adult-toggle">
+                <span class="games-adult-label">Показать 18+</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-18plus">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <p class="section-text" id="games-text"></p>
 
         <div class="games-grid" id="games-grid">
             <!-- карточки игр подставятся из JSON -->
@@ -62,7 +185,7 @@
 
     <!-- НОВОСТИ -->
     <section id="news" class="section card observe" data-section>
-        <h2 class="section-title" id="news-title">Новости</h2>
+        <h2 class="section-title" id="news-title"></h2>
 
         <div class="news-list" id="news-list">
             <!-- сюда JS подставит новости -->
@@ -71,7 +194,7 @@
 
     <!-- КОНТАКТЫ -->
     <section id="contacts" class="section card observe" data-section>
-        <h2 class="section-title" id="contacts-title">Контакты</h2>
+        <h2 class="section-title" id="contacts-title"></h2>
         <ul class="contacts-list" id="contacts-list">
             <!-- контакты подставятся из JSON -->
         </ul>
@@ -84,37 +207,103 @@
 
 <script>
     (function () {
-        // Анимация появления секций
+        // ===== Общие вещи: анимация секций, год в подвале =====
         const sections = document.querySelectorAll('[data-section]');
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('section--visible');
-                }
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('section--visible');
+                    }
+                });
+            }, {
+                threshold: 0.35
             });
-        }, {
-            threshold: 0.35
-        });
 
-        sections.forEach(section => observer.observe(section));
+            sections.forEach(section => observer.observe(section));
+        } else {
+            // Без поддержки IntersectionObserver просто показываем секции
+            sections.forEach(section => section.classList.add('section--visible'));
+        }
 
         // Год в подвале
-        document.getElementById('year').textContent = new Date().getFullYear();
+        const yearEl = document.getElementById('year');
+        if (yearEl) {
+            yearEl.textContent = new Date().getFullYear();
+        }
 
         const newsContainer  = document.getElementById('news-list');
         const gamesContainer = document.getElementById('games-grid');
+        const adultToggle    = document.getElementById('toggle-18plus');
 
-        // ====== CONTENT.JSON (тексты) ======
-        async function loadContentJson() {
+        const ADULT_TOGGLE_KEY = 'gamesShow18Plus';
+        let showAdultGames = false;
+
+        // ===== Работа с localStorage для 18+ =====
+        function getSavedAdultToggle() {
             try {
-                const res = await fetch('content/content.json');
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                applyContent(data);
-            } catch (err) {
-                console.error('Ошибка загрузки content.json:', err);
+                return localStorage.getItem(ADULT_TOGGLE_KEY);
+            } catch (e) {
+                return null;
             }
+        }
+
+        function setSavedAdultToggle(value) {
+            try {
+                localStorage.setItem(ADULT_TOGGLE_KEY, value);
+            } catch (e) {
+                // игнорируем ошибки (например, в приватном режиме)
+            }
+        }
+
+        function applyAdultFilterToGames() {
+            if (!gamesContainer) return;
+            const cards = gamesContainer.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                const isAdult = card.dataset.adult === 'true';
+                if (isAdult && !showAdultGames) {
+                    card.classList.add('game-card--hidden-adult');
+                } else {
+                    card.classList.remove('game-card--hidden-adult');
+                }
+            });
+        }
+
+        function onAdultToggleChange(e) {
+            const checked = e.target.checked;
+
+            // Включение 18+ — показать предупреждение
+            if (checked && !showAdultGames) {
+                const ok = window.confirm(
+                    'Эта настройка покажет игры с контентом 18+.\n' +
+                    'Подтвердите, что вам уже есть 18 лет.'
+                );
+                if (!ok) {
+                    e.target.checked = false;
+                    return;
+                }
+            }
+
+            showAdultGames = checked;
+            setSavedAdultToggle(showAdultGames ? '1' : '0');
+            applyAdultFilterToGames();
+        }
+
+        // Инициализация состояния переключателя 18+ из localStorage
+        if (adultToggle) {
+            const saved = getSavedAdultToggle();
+            showAdultGames = saved === '1';
+            adultToggle.checked = showAdultGames;
+            adultToggle.addEventListener('change', onAdultToggleChange);
+        }
+
+        // ====== CONTENT.JSON (критичный JSON) ======
+        async function loadContentJson() {
+            const res = await fetch('content/content.json', { cache: 'no-cache' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            applyContent(data);
         }
 
         function applyContent(data) {
@@ -155,12 +344,13 @@
                     const titleEl = document.getElementById(id + '-title');
                     const textEl  = document.getElementById(id + '-text');
 
-                    if (titleEl && sec.title) {
+                    if (titleEl && sec && sec.title) {
                         titleEl.textContent = sec.title;
                     }
-                    if (textEl) {
+                    if (textEl && sec) {
                         if (sec.html) textEl.innerHTML = sec.html;
                         else if (sec.text) textEl.textContent = sec.text;
+                        else textEl.textContent = '';
                     }
                 });
             }
@@ -180,8 +370,9 @@
                     link.className = 'contact-link';
                     link.href = c.href || '#';
                     link.textContent = c.text || '';
-                    if (c.href && c.href.startsWith('http')) {
+                    if (c.href && /^https?:\/\//i.test(c.href)) {
                         link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
                     }
 
                     li.appendChild(labelSpan);
@@ -191,24 +382,27 @@
             }
         }
 
-        // ====== NEWS.JSON (новости) ======
+        // ====== NEWS.JSON (новости, не критично) ======
         async function loadNewsJson() {
+            if (!newsContainer) return;
             try {
-                if (!newsContainer) return;
-                const res = await fetch('content/news.json');
+                const res = await fetch('content/news.json', { cache: 'no-cache' });
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const items = await res.json();
                 renderNews(items, newsContainer);
             } catch (err) {
                 console.error('Ошибка загрузки news.json:', err);
-                if (newsContainer) {
-                    newsContainer.innerHTML = '<p class="news-error">Не удалось загрузить новости.</p>';
-                }
+                newsContainer.innerHTML = '<p class="news-error">Не удалось загрузить новости.</p>';
             }
         }
 
         function renderNews(items, container) {
             container.innerHTML = '';
+            if (!Array.isArray(items) || items.length === 0) {
+                container.innerHTML = '<p class="news-empty">Пока нет новостей.</p>';
+                return;
+            }
+
             items.forEach(item => {
                 const article = document.createElement('article');
                 article.className = 'news-item';
@@ -219,6 +413,8 @@
                 if (wrapperTag === 'a') {
                     wrapper.href = item.url;
                     wrapper.className = 'news-item-link';
+                    wrapper.target = '_blank';
+                    wrapper.rel = 'noopener noreferrer';
                 } else {
                     wrapper.className = 'news-item-content';
                 }
@@ -250,26 +446,34 @@
             });
         }
 
-        // ====== GAMES.JSON + infogame.json ======
+        // ====== GAMES.JSON + infogame.json (игры, не критично) ======
         async function loadGamesJson() {
+            if (!gamesContainer) return;
             try {
-                if (!gamesContainer) return;
-                const res = await fetch('content/games.json');
+                const res = await fetch('content/games.json', { cache: 'no-cache' });
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const list = await res.json();
                 await renderGames(list, gamesContainer);
             } catch (err) {
                 console.error('Ошибка загрузки games.json:', err);
+                gamesContainer.innerHTML = '<p class="games-error">Не удалось загрузить список игр.</p>';
             }
         }
 
         async function renderGames(list, container) {
             container.innerHTML = '';
+            if (!Array.isArray(list) || list.length === 0) {
+                container.innerHTML = '<p class="games-empty">Пока нет игр.</p>';
+                return;
+            }
 
-            for (const item of list) {
+            // Загружаем данные по играм параллельно
+            const cardsPromises = list.map(async (item) => {
                 const id = item.id;
+                if (!id) return null;
+
                 try {
-                    const res = await fetch(`games/${id}/infogame.json`);
+                    const res = await fetch(`games/${id}/infogame.json`, { cache: 'no-cache' });
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     const game = await res.json();
 
@@ -290,6 +494,7 @@
                     const card = document.createElement('a');
                     card.href = `games/${id}/index.html`;
                     card.target = '_blank';
+                    card.rel = 'noopener noreferrer';
                     card.className = 'game-card';
 
                     const img = document.createElement('img');
@@ -301,23 +506,51 @@
                     nameEl.className = 'game-card-title';
                     nameEl.textContent = title;
 
+                    // флаг 18+ из infogame.json
+                    const isAdult = game.adult === true || game.age18 === true || game['18plus'] === true;
+                    card.dataset.adult = isAdult ? 'true' : 'false';
+
                     card.appendChild(img);
                     card.appendChild(nameEl);
 
-                    container.appendChild(card);
+                    return card;
                 } catch (err) {
                     console.error('Ошибка загрузки игры', id, err);
+                    return null;
                 }
-            }
+            });
+
+            const cards = await Promise.all(cardsPromises);
+            cards
+                .filter(Boolean)
+                .forEach(card => container.appendChild(card));
+
+            // применяем фильтр 18+ после рендера
+            applyAdultFilterToGames();
         }
 
-        // Ждём загрузки трёх JSON'ов, потом убираем чёрный экран
+        // ====== Старт: ждём JSON'ы ======
         Promise.all([
-            loadContentJson(),
-            loadNewsJson(),
-            loadGamesJson()
-        ]).finally(() => {
+            loadContentJson(), // критичный
+            loadNewsJson(),    // не критично
+            loadGamesJson()    // не критично
+        ])
+        .then(() => {
+            // Все ключевые данные загружены — убираем чёрный экран
             document.body.classList.remove('loading');
+        })
+        .catch((err) => {
+            // Если сюда попали — не загрузился критичный контент (content.json)
+            console.error('Критическая ошибка загрузки контента:', err);
+            const loader = document.getElementById('app-loader');
+            if (loader) {
+                loader.innerHTML =
+                    '<div class="loader-error">' +
+                        '<p>Не удалось загрузить данные сайта.</p>' +
+                        '<p>Попробуйте обновить страницу позже.</p>' +
+                    '</div>';
+            }
+            // ВАЖНО: класс .loading НЕ убираем, чтобы не показать мусорный контент
         });
     })();
 </script>
