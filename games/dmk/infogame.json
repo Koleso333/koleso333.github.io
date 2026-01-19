@@ -1,0 +1,18 @@
+{
+  "id": "dmk",
+  "title": "Догони меня, кирпич! RELOAD",
+  "year": 2026,
+  "description": "Твоя задача убежать от кирпича чтобы не сдохнуть! Перезагрузка на Godot!",
+  "banner": "banner.png",
+  "logo": "logo.png",
+  "adult": false,
+  "downloads": [
+    {
+      "label": "Скачать .exe",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/Tiramisu.exe",
+      "version": "Tiramisu (v0.1)",
+      "year": 2026,
+      "style": "green"
+    }
+  ]
+}

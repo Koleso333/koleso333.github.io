@@ -1,0 +1,117 @@
+{
+  "id": "dmk-old",
+  "title": "Догони меня, кирпич! OLD",
+  "year": 2025,
+  "description": "Твоя задача убежать от кирпича чтобы не сдохнуть! Годы разработки: 2023-2025. Отменена",
+  "banner": "banner.png",
+  "logo": "logo.png",
+  "adult": false,
+  "screenshots": [
+    "screenshot-1.png",
+    "screenshot-2.png",
+    "screenshot-3.png",
+	"screenshot-4.png",
+	"screenshot-5.png",
+	"screenshot-6.png"
+  ],
+  "downloads": [
+    {
+      "label": "Скачать .newtrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/LR5B1.newtrobat",
+      "version": "LR5B1 (v0.9.4.1, latest)",
+      "year": 2025,
+      "style": "green"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/Lite-Release.4.catrobat",
+      "version": "Lite-release 4 (v0.9.4)",
+      "year": 2025,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/Lite-Release.3.maybe.not.catrobat",
+      "version": "Lite-release 3 (v0.9.3)",
+      "year": 2025,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/Lite-Release.2.catrobat",
+      "version": "Lite-release 2 (v0.9.2)",
+      "year": 2025,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/Lite-Release.catrobat",
+      "version": "Lite-release (v0.9.1)",
+      "year": 2024,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/Pre-Release.catrobat",
+      "version": "Pre-release (v0.9)",
+      "year": 2023,
+      "style": "green"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/BETA.RELEASE.catrobat",
+      "version": "BETA-RELEASE (v0.8)",
+      "year": 2023,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/FINAL.BETA.catrobat",
+      "version": "FINAL-BETA (v0.7)",
+      "year": 2023,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/BETA.5.catrobat",
+      "version": "BETA 5 (v0.6)",
+      "year": 2023,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/BETA.4.catrobat",
+      "version": "BETA 4 (v0.5)",
+      "year": 2023,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/BETA.3.catrobat",
+      "version": "BETA 3 (v0.4)",
+      "year": 2023,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/BETA.2.catrobat",
+      "version": "BETA 2 (v0.3)",
+      "year": 2023,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/BETA.catrobat",
+      "version": "BETA (v0.2)",
+      "year": 2023,
+      "style": "white"
+    },
+	{
+      "label": "Скачать .catrobat",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk/DEMO.catrobat",
+      "version": "DEMO (v0.1)",
+      "year": 2023,
+      "style": "green"
+    }
+  ]
+}
