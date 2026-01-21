@@ -1,5 +1,14 @@
 [	
   {
+	"id": "album-release-1",
+    "date": "2025-01-21",
+    "dateLabel": "21.01.2025",
+    "title": "Мой альбом XZSDAC!",
+    "text": "Что бы послушать мой альбом, кликни на эту новость.",
+	"clickable": true,
+	"url": "tripleplayer/XZSDAC/index.html"
+  },
+  {
     "id": "dmk-r-release",
     "date": "2025-01-19",
     "dateLabel": "19.01.2025",
