@@ -7,12 +7,19 @@
   "logo": "logo.png",
   "adult": false,
   "downloads": [
+	{
+      "label": "Скачать .exe",
+      "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/Vaio.exe",
+      "version": "Vaio (v0.2)",
+      "year": 2026,
+      "style": "green"
+    },
     {
       "label": "Скачать .exe",
       "url": "https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/Tiramisu.exe",
       "version": "Tiramisu (v0.1)",
       "year": 2026,
-      "style": "green"
+      "style": "white"
     }
   ]
 }
