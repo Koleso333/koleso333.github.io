@@ -122,11 +122,7 @@
         }
     </style>
 </head>
-<body class="loading">
-<!-- Чёрный экран до загрузки JSON -->
-<div id="app-loader" class="app-loader">
-    Загрузка...
-</div>
+<body>
 
 <header class="site-header" id="top">
     <div class="header-inner">
@@ -138,15 +134,13 @@
             </div>
 
             <p class="brand-subtitle">
-                личный хаб игр, саундтреков и прочих штук
+                Здесь можно скачать мою игрушку или что-то посмотреть!
             </p>
         </div>
 
         <nav class="nav" id="nav">
-            <!-- дефолтные пункты (перезапишутся из JSON) -->
             <a href="#about" class="nav-link">Обо мне</a>
             <a href="#games" class="nav-link">Игры</a>
-            <a href="#news" class="nav-link">Саундтреки</a>
             <a href="#news" class="nav-link">Новости</a>
             <a href="#contacts" class="nav-link">Контакты</a>
         </nav>
@@ -156,15 +150,15 @@
 <main class="page">
 
     <!-- ОБО МНЕ -->
-    <section id="about" class="section card observe" data-section>
-        <h2 class="section-title" id="about-title"></h2>
-        <p class="section-text" id="about-text"></p>
+    <section id="about" class="section card">
+        <h2 class="section-title" id="about-title">Обо мне</h2>
+        <p class="section-text" id="about-text">Меня зовут <strong>Колесо</strong>. Я начинающий разработчик игр, люблю что‑либо создавать и экспериментировать. Этот сайт считай тоже эксперимент.</p>
     </section>
 
     <!-- ИГРЫ -->
-    <section id="games" class="section card observe" data-section>
+    <section id="games" class="section card">
         <div class="games-header">
-            <h2 class="section-title" id="games-title"></h2>
+            <h2 class="section-title" id="games-title">Игры</h2>
 
             <!-- переключатель 18+ справа от заголовка -->
             <div class="games-adult-toggle">
@@ -176,27 +170,76 @@
             </div>
         </div>
 
-        <p class="section-text" id="games-text"></p>
+        <p class="section-text" id="games-text">Это мои игры! Скоро их тут будет больше.</p>
 
         <div class="games-grid" id="games-grid">
-            <!-- карточки игр подставятся из JSON -->
+            <a href="games/cex-drochilni/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="true">
+                <img src="games/cex-drochilni/logo.png" alt="Цex дрочильни" class="game-card-logo">
+                <div class="game-card-title">Цex дрочильни</div>
+            </a>
+            <a href="games/baltika-clicker/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
+                <img src="games/baltika-clicker/logo.png" alt="Балтика Кликер Alpha" class="game-card-logo">
+                <div class="game-card-title">Балтика Кликер Alpha</div>
+            </a>
+            <a href="games/dmk-old/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
+                <img src="games/dmk-old/logo.png" alt="Догони меня, кирпич! OLD" class="game-card-logo">
+                <div class="game-card-title">Догони меня, кирпич! OLD</div>
+            </a>
+            <a href="games/dmk/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
+                <img src="games/dmk/logo.png" alt="Догони меня, кирпич! RELOAD" class="game-card-logo">
+                <div class="game-card-title">Догони меня, кирпич! RELOAD</div>
+            </a>
         </div>
     </section>
 
     <!-- НОВОСТИ -->
-    <section id="news" class="section card observe" data-section>
-        <h2 class="section-title" id="news-title"></h2>
+    <section id="news" class="section card">
+        <h2 class="section-title" id="news-title">Новости</h2>
 
         <div class="news-list" id="news-list">
-            <!-- сюда JS подставит новости -->
+            <article class="news-item">
+                <a href="https://github.com/Koleso333/KislinkaCore" class="news-item-link" target="_blank" rel="noopener noreferrer">
+                    <time class="news-date" datetime="2026-03-25">25.03.2026</time>
+                    <h3 class="news-title">Выход Kislinka Core!</h3>
+                    <p class="news-text">Вышел Kislinka Core, это что то типа фреймворка для приложений, где суть - ты пишешь логику, движок выполняет визуал и прочее. Кликни на новость и ты попадёшь в Github проекта.</p>
+                </a>
+            </article>
+            <article class="news-item">
+                <a href="games/dmk/index.html" class="news-item-link" target="_blank" rel="noopener noreferrer">
+                    <time class="news-date" datetime="2026-01-19">19.01.2026</time>
+                    <h3 class="news-title">Выход Догони меня, кирпич! RELOAD</h3>
+                    <p class="news-text">Вышла первая версия ДМК Reload, а именно Tiramisu (v0.1)! Клик по новости открывает страничку игры.</p>
+                </a>
+            </article>
+            <article class="news-item">
+                <div class="news-item-content">
+                    <time class="news-date" datetime="2026-01-19">19.01.2026</time>
+                    <h3 class="news-title">Апдейт сайта</h3>
+                    <p class="news-text">Теперь есть переключатель 18+, а также добавлена ДМК (затянул немного).</p>
+                </div>
+            </article>
+            <article class="news-item">
+                <div class="news-item-content">
+                    <time class="news-date" datetime="2025-12-12">12.12.2025</time>
+                    <h3 class="news-title">Запущен сайт Koleso333.ru</h3>
+                    <p class="news-text">Круто, да? Теперь это мой сайт</p>
+                </div>
+            </article>
         </div>
     </section>
 
     <!-- КОНТАКТЫ -->
-    <section id="contacts" class="section card observe" data-section>
-        <h2 class="section-title" id="contacts-title"></h2>
+    <section id="contacts" class="section card">
+        <h2 class="section-title" id="contacts-title">Контакты со мной</h2>
         <ul class="contacts-list" id="contacts-list">
-            <!-- контакты подставятся из JSON -->
+            <li>
+                <span class="contact-label">Telegram</span>
+                <a href="https://t.me/Kolesobesspic" class="contact-link" target="_blank" rel="noopener noreferrer">@Kolesobesspic</a>
+            </li>
+            <li>
+                <span class="contact-label">Email</span>
+                <a href="mailto:kravchenko6602400@gmail.com" class="contact-link">kravchenko6602400@gmail.com</a>
+            </li>
         </ul>
     </section>
 </main>
@@ -207,33 +250,12 @@
 
 <script>
     (function () {
-        // ===== Общие вещи: анимация секций, год в подвале =====
-        const sections = document.querySelectorAll('[data-section]');
-
-        if ('IntersectionObserver' in window) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('section--visible');
-                    }
-                });
-            }, {
-                threshold: 0.35
-            });
-
-            sections.forEach(section => observer.observe(section));
-        } else {
-            // Без поддержки IntersectionObserver просто показываем секции
-            sections.forEach(section => section.classList.add('section--visible'));
-        }
-
         // Год в подвале
         const yearEl = document.getElementById('year');
         if (yearEl) {
             yearEl.textContent = new Date().getFullYear();
         }
 
-        const newsContainer  = document.getElementById('news-list');
         const gamesContainer = document.getElementById('games-grid');
         const adultToggle    = document.getElementById('toggle-18plus');
 
@@ -298,260 +320,7 @@
             adultToggle.addEventListener('change', onAdultToggleChange);
         }
 
-        // ====== CONTENT.JSON (критичный JSON) ======
-        async function loadContentJson() {
-            const res = await fetch('content/content.json', { cache: 'no-cache' });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            applyContent(data);
-        }
-
-        function applyContent(data) {
-            // Title
-            if (data.meta && data.meta.title) {
-                document.title = data.meta.title;
-            }
-
-            // Шапка
-            const heroTitleEl = document.querySelector('.hero-title');
-            const brandSubtitleEl = document.querySelector('.brand-subtitle');
-
-            if (data.brand) {
-                if (data.brand.heroTitle && heroTitleEl) {
-                    heroTitleEl.textContent = data.brand.heroTitle;
-                }
-                if (data.brand.subtitle && brandSubtitleEl) {
-                    brandSubtitleEl.textContent = data.brand.subtitle;
-                }
-            }
-
-            // Навигация
-            const navEl = document.getElementById('nav');
-            if (navEl && Array.isArray(data.nav)) {
-                navEl.innerHTML = '';
-                data.nav.forEach(item => {
-                    const a = document.createElement('a');
-                    a.className = 'nav-link';
-                    a.href = '#' + item.id;
-                    a.textContent = item.label;
-                    navEl.appendChild(a);
-                });
-            }
-
-            // Секции (любые id из data.sections)
-            if (data.sections) {
-                Object.entries(data.sections).forEach(([id, sec]) => {
-                    const titleEl = document.getElementById(id + '-title');
-                    const textEl  = document.getElementById(id + '-text');
-
-                    if (titleEl && sec && sec.title) {
-                        titleEl.textContent = sec.title;
-                    }
-                    if (textEl && sec) {
-                        if (sec.html) textEl.innerHTML = sec.html;
-                        else if (sec.text) textEl.textContent = sec.text;
-                        else textEl.textContent = '';
-                    }
-                });
-            }
-
-            // Контакты
-            const contactsList = document.getElementById('contacts-list');
-            if (contactsList && Array.isArray(data.contacts)) {
-                contactsList.innerHTML = '';
-                data.contacts.forEach(c => {
-                    const li = document.createElement('li');
-
-                    const labelSpan = document.createElement('span');
-                    labelSpan.className = 'contact-label';
-                    labelSpan.textContent = c.label || '';
-
-                    const link = document.createElement('a');
-                    link.className = 'contact-link';
-                    link.href = c.href || '#';
-                    link.textContent = c.text || '';
-                    if (c.href && /^https?:\/\//i.test(c.href)) {
-                        link.target = '_blank';
-                        link.rel = 'noopener noreferrer';
-                    }
-
-                    li.appendChild(labelSpan);
-                    li.appendChild(link);
-                    contactsList.appendChild(li);
-                });
-            }
-        }
-
-        // ====== NEWS.JSON (новости, не критично) ======
-        async function loadNewsJson() {
-            if (!newsContainer) return;
-            try {
-                const res = await fetch('content/news.json', { cache: 'no-cache' });
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const items = await res.json();
-                renderNews(items, newsContainer);
-            } catch (err) {
-                console.error('Ошибка загрузки news.json:', err);
-                newsContainer.innerHTML = '<p class="news-error">Не удалось загрузить новости.</p>';
-            }
-        }
-
-        function renderNews(items, container) {
-            container.innerHTML = '';
-            if (!Array.isArray(items) || items.length === 0) {
-                container.innerHTML = '<p class="news-empty">Пока нет новостей.</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                const article = document.createElement('article');
-                article.className = 'news-item';
-
-                const wrapperTag = (item.clickable && item.url) ? 'a' : 'div';
-                const wrapper = document.createElement(wrapperTag);
-
-                if (wrapperTag === 'a') {
-                    wrapper.href = item.url;
-                    wrapper.className = 'news-item-link';
-                    wrapper.target = '_blank';
-                    wrapper.rel = 'noopener noreferrer';
-                } else {
-                    wrapper.className = 'news-item-content';
-                }
-
-                if (item.date || item.dateLabel) {
-                    const time = document.createElement('time');
-                    time.className = 'news-date';
-                    if (item.date) time.dateTime = item.date;
-                    time.textContent = item.dateLabel || item.date || '';
-                    wrapper.appendChild(time);
-                }
-
-                if (item.title) {
-                    const h3 = document.createElement('h3');
-                    h3.className = 'news-title';
-                    h3.textContent = item.title;
-                    wrapper.appendChild(h3);
-                }
-
-                if (item.text) {
-                    const p = document.createElement('p');
-                    p.className = 'news-text';
-                    p.textContent = item.text;
-                    wrapper.appendChild(p);
-                }
-
-                article.appendChild(wrapper);
-                container.appendChild(article);
-            });
-        }
-
-        // ====== GAMES.JSON + infogame.json (игры, не критично) ======
-        async function loadGamesJson() {
-            if (!gamesContainer) return;
-            try {
-                const res = await fetch('content/games.json', { cache: 'no-cache' });
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const list = await res.json();
-                await renderGames(list, gamesContainer);
-            } catch (err) {
-                console.error('Ошибка загрузки games.json:', err);
-                gamesContainer.innerHTML = '<p class="games-error">Не удалось загрузить список игр.</p>';
-            }
-        }
-
-        async function renderGames(list, container) {
-            container.innerHTML = '';
-            if (!Array.isArray(list) || list.length === 0) {
-                container.innerHTML = '<p class="games-empty">Пока нет игр.</p>';
-                return;
-            }
-
-            // Загружаем данные по играм параллельно
-            const cardsPromises = list.map(async (item) => {
-                const id = item.id;
-                if (!id) return null;
-
-                try {
-                    const res = await fetch(`games/${id}/infogame.json`, { cache: 'no-cache' });
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                    const game = await res.json();
-
-                    const title = game.title || id;
-
-                    // корректный путь к логотипу
-                    let logoPath;
-                    if (game.logo) {
-                        if (game.logo.startsWith('http') || game.logo.startsWith('/')) {
-                            logoPath = game.logo;
-                        } else {
-                            logoPath = `games/${id}/${game.logo}`;
-                        }
-                    } else {
-                        logoPath = `games/${id}/logo.png`;
-                    }
-
-                    const card = document.createElement('a');
-                    card.href = `games/${id}/index.html`;
-                    card.target = '_blank';
-                    card.rel = 'noopener noreferrer';
-                    card.className = 'game-card';
-
-                    const img = document.createElement('img');
-                    img.src = logoPath;
-                    img.alt = title;
-                    img.className = 'game-card-logo';
-
-                    const nameEl = document.createElement('div');
-                    nameEl.className = 'game-card-title';
-                    nameEl.textContent = title;
-
-                    // флаг 18+ из infogame.json
-                    const isAdult = game.adult === true || game.age18 === true || game['18plus'] === true;
-                    card.dataset.adult = isAdult ? 'true' : 'false';
-
-                    card.appendChild(img);
-                    card.appendChild(nameEl);
-
-                    return card;
-                } catch (err) {
-                    console.error('Ошибка загрузки игры', id, err);
-                    return null;
-                }
-            });
-
-            const cards = await Promise.all(cardsPromises);
-            cards
-                .filter(Boolean)
-                .forEach(card => container.appendChild(card));
-
-            // применяем фильтр 18+ после рендера
-            applyAdultFilterToGames();
-        }
-
-        // ====== Старт: ждём JSON'ы ======
-        Promise.all([
-            loadContentJson(), // критичный
-            loadNewsJson(),    // не критично
-            loadGamesJson()    // не критично
-        ])
-        .then(() => {
-            // Все ключевые данные загружены — убираем чёрный экран
-            document.body.classList.remove('loading');
-        })
-        .catch((err) => {
-            // Если сюда попали — не загрузился критичный контент (content.json)
-            console.error('Критическая ошибка загрузки контента:', err);
-            const loader = document.getElementById('app-loader');
-            if (loader) {
-                loader.innerHTML =
-                    '<div class="loader-error">' +
-                        '<p>Не удалось загрузить данные сайта.</p>' +
-                        '<p>Попробуйте обновить страницу позже.</p>' +
-                    '</div>';
-            }
-            // ВАЖНО: класс .loading НЕ убираем, чтобы не показать мусорный контент
-        });
+        applyAdultFilterToGames();
     })();
 </script>
 </body>

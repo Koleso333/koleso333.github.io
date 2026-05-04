@@ -2,49 +2,67 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Игра - Koleso</title>
+    <title>Догони меня, кирпич! RELOAD — Koleso</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- общий стиль из корня -->
     <link rel="stylesheet" href="../../style.css">
 </head>
 <body class="game-page">
 <main class="game-page-main">
-    <header class="game-hero" id="game-hero">
+    <header class="game-hero" id="game-hero" style="background-image: url('banner.png')">
         <div class="game-hero-inner">
-            <img id="game-logo" class="game-logo" src="logo.png" alt="">
+            <img id="game-logo" class="game-logo" src="logo.png" alt="Догони меня, кирпич! RELOAD">
             <div class="game-hero-text">
-                <h1 id="game-title" class="game-page-title">Название игры</h1>
-                <p id="game-description" class="game-page-description">
-                    Описание игры.
-                </p>
+                <h1 id="game-title" class="game-page-title">Догони меня, кирпич! RELOAD</h1>
+                <p id="game-description" class="game-page-description">Твоя задача убежать от кирпича чтобы не сдохнуть! Перезагрузка на Godot!</p>
             </div>
         </div>
-
-        <!-- Год игры (справа снизу баннера) -->
-        <span class="game-year-tag" id="game-year-tag"></span>
+        <span class="game-year-tag" id="game-year-tag">2026</span>
     </header>
 
-    <!-- Скриншоты: горизонтальная полоса + стрелки -->
-    <section class="game-section" id="game-screens-section">
-        <h2 class="game-section-title">Скриншоты</h2>
-
-        <div class="game-screens-wrapper" id="game-screens-wrapper">
-            <button class="screen-nav screen-nav--left" id="screen-prev" aria-label="Предыдущий скриншот">‹</button>
-
-            <div class="game-screens" id="game-screens"></div>
-
-            <button class="screen-nav screen-nav--right" id="screen-next" aria-label="Следующий скриншот">›</button>
-
-            <div class="game-screens-gradient game-screens-gradient--left"></div>
-            <div class="game-screens-gradient game-screens-gradient--right"></div>
-        </div>
-    </section>
-
-    <!-- Скачивания -->
     <section class="game-section" id="game-downloads-section">
         <h2 class="game-section-title">Скачать</h2>
-        <div class="game-downloads" id="game-downloads"></div>
+        <div class="game-downloads" id="game-downloads">
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/dmk-reload-pashtelplus-android-v0.3.1-dev.apk" target="_blank" class="download-button download-button--green">
+                <span class="download-button-label">Скачать .apk (beta)</span>
+                <span class="download-button-version">Pashtel+ (v0.3.1)</span>
+                <span class="download-button-year">04.05.2026</span>
+            </a>
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/dmk-reload-pashtelplus-win-v0.3.1-dev.exe" target="_blank" class="download-button download-button--green">
+                <span class="download-button-label">Скачать .exe</span>
+                <span class="download-button-version">Pashtel+ (v0.3.1)</span>
+                <span class="download-button-year">04.05.2026</span>
+            </a>
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/dmk-reload-pashtel-android-v0.3-dev.apk" target="_blank" class="download-button download-button--white">
+                <span class="download-button-label">Скачать .apk (beta)</span>
+                <span class="download-button-version">Pashtel (v0.3)</span>
+                <span class="download-button-year">24.04.2026</span>
+            </a>
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/dmk-reload-pashtel-win-v0.3-dev.exe" target="_blank" class="download-button download-button--white">
+                <span class="download-button-label">Скачать .exe</span>
+                <span class="download-button-version">Pashtel (v0.3)</span>
+                <span class="download-button-year">24.04.2026</span>
+            </a>
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/dmk-reload-highvaio-android-v0.2.1-dev.apk" target="_blank" class="download-button download-button--white">
+                <span class="download-button-label">Скачать .apk (beta)</span>
+                <span class="download-button-version">High Vaio (v0.2.1)</span>
+                <span class="download-button-year">21.01.2026</span>
+            </a>
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/dmk-reload-highvaio-win-v0.2.1-dev.exe" target="_blank" class="download-button download-button--white">
+                <span class="download-button-label">Скачать .exe</span>
+                <span class="download-button-version">High Vaio (v0.2.1)</span>
+                <span class="download-button-year">21.01.2026</span>
+            </a>
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/Vaio.exe" target="_blank" class="download-button download-button--white">
+                <span class="download-button-label">Скачать .exe</span>
+                <span class="download-button-version">Vaio (v0.2)</span>
+                <span class="download-button-year">19.04.2026</span>
+            </a>
+            <a href="https://github.com/Koleso333/koleso333.github.io/releases/download/dmk-reload/Tiramisu.exe" target="_blank" class="download-button download-button--white">
+                <span class="download-button-label">Скачать .exe</span>
+                <span class="download-button-version">Tiramisu (v0.1)</span>
+                <span class="download-button-year">19.01.2026</span>
+            </a>
+        </div>
     </section>
 </main>
 
@@ -57,32 +75,11 @@
 </div>
 
 <script>
-    (async function () {
-        const hero           = document.getElementById('game-hero');
-        const logoImg        = document.getElementById('game-logo');
-        const titleEl        = document.getElementById('game-title');
-        const descrEl        = document.getElementById('game-description');
-        const yearTag        = document.getElementById('game-year-tag');
-
-        const screensSection = document.getElementById('game-screens-section');
-        const screensWrapper = document.getElementById('game-screens-wrapper');
-        const screens        = document.getElementById('game-screens');
-        const prevBtn        = document.getElementById('screen-prev');
-        const nextBtn        = document.getElementById('screen-next');
-        const gradLeft       = document.querySelector('.game-screens-gradient--left');
-        const gradRight      = document.querySelector('.game-screens-gradient--right');
-
-        const downloads        = document.getElementById('game-downloads');
-        const downloadsSection = document.getElementById('game-downloads-section');
-
-        // Вьюер скриншотов
+    (function () {
         const viewer      = document.getElementById('screenshot-viewer');
         const viewerImg   = document.getElementById('screenshot-viewer-img');
         const viewerClose = document.getElementById('screenshot-viewer-close');
-
         let isZoomed = false;
-        let currentSlide = 0;
-        let slidesCount  = 0;
 
         function applyZoom() {
             const scale = isZoomed ? 1.7 : 1;
@@ -106,33 +103,13 @@
             viewer.classList.remove('viewer--open');
         }
 
-        function updateScreens() {
-            if (!screensWrapper || !screens) return;
-            const width = screensWrapper.clientWidth;
-            screens.style.transform = `translateX(-${currentSlide * width}px)`;
-
-            if (prevBtn) {
-                prevBtn.classList.toggle('screen-nav--disabled', currentSlide === 0);
-            }
-            if (nextBtn) {
-                nextBtn.classList.toggle('screen-nav--disabled', currentSlide >= slidesCount - 1);
-            }
-        }
-
-        // Обработчики вьюера
         if (viewer && viewerClose) {
             viewerClose.addEventListener('click', closeViewer);
-
             viewer.addEventListener('click', (e) => {
-                if (e.target === viewer) {
-                    closeViewer();
-                }
+                if (e.target === viewer) closeViewer();
             });
-
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeViewer();
-                }
+                if (e.key === 'Escape') closeViewer();
             });
         }
 
@@ -142,149 +119,6 @@
                 isZoomed = !isZoomed;
                 applyZoom();
             });
-        }
-
-        // Открытие вьюера по клику на миниатюру
-        if (screens) {
-            screens.addEventListener('click', (e) => {
-                const img = e.target.closest('img');
-                if (!img) return;
-                openViewer(img.src, img.alt);
-            });
-        }
-
-        // Стрелки скриншотов
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (currentSlide > 0) {
-                    currentSlide--;
-                    updateScreens();
-                }
-            });
-        }
-
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                if (currentSlide < slidesCount - 1) {
-                    currentSlide++;
-                    updateScreens();
-                }
-            });
-        }
-
-        window.addEventListener('resize', () => {
-            if (slidesCount > 1) {
-                updateScreens();
-            }
-        });
-
-        // ===== Загрузка данных игры из infogame.json =====
-        try {
-            const res = await fetch('infogame.json');
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-
-            const title = data.title || 'Игра';
-            document.title = title + ' — Koleso';
-
-            // Год игры (Только для баннера, не для кнопок)
-            const gameYear = (data.year !== undefined && data.year !== null)
-                ? String(data.year)
-                : null;
-
-            // Баннер
-            if (hero && data.banner) {
-                hero.style.backgroundImage = `url('${data.banner}')`;
-            }
-
-            // Год в правом нижнем углу баннера
-            if (yearTag) {
-                if (gameYear) {
-                    yearTag.textContent = gameYear;
-                    yearTag.style.display = 'block';
-                } else {
-                    yearTag.style.display = 'none';
-                }
-            }
-
-            // Лого
-            if (logoImg) {
-                logoImg.src = data.logo || 'logo.png';
-                logoImg.alt = title;
-            }
-
-            // Заголовок
-            if (titleEl) titleEl.textContent = title;
-
-            // Описание
-            if (descrEl) {
-                if (data.descriptionHtml) descrEl.innerHTML = data.descriptionHtml;
-                else if (data.description) descrEl.textContent = data.description;
-            }
-
-            // Скриншоты (горизонтальная карусель)
-            if (screens && Array.isArray(data.screenshots) && data.screenshots.length) {
-                slidesCount = data.screenshots.length;
-
-                data.screenshots.forEach(path => {
-                    const img = document.createElement('img');
-                    img.src = path;
-                    img.alt = title;
-                    screens.appendChild(img);
-                });
-
-                if (slidesCount <= 1) {
-                    if (prevBtn)  prevBtn.style.display  = 'none';
-                    if (nextBtn)  nextBtn.style.display  = 'none';
-                    if (gradLeft) gradLeft.style.display = 'none';
-                    if (gradRight)gradRight.style.display= 'none';
-                } else {
-                    updateScreens();
-                }
-            } else if (screensSection) {
-                screensSection.style.display = 'none';
-            }
-
-            // Кнопки скачивания
-            if (downloads && Array.isArray(data.downloads) && data.downloads.length) {
-                data.downloads.forEach(d => {
-                    const a = document.createElement('a');
-                    a.href = d.url || '#';
-                    a.target = '_blank';
-                    a.className = 'download-button ' +
-                        (d.style === 'green' ? 'download-button--green' : 'download-button--white');
-
-                    const labelSpan = document.createElement('span');
-                    labelSpan.className = 'download-button-label';
-                    labelSpan.textContent = d.label || 'Скачать';
-                    a.appendChild(labelSpan);
-
-                    if (d.version) {
-                        const verSpan = document.createElement('span');
-                        verSpan.className = 'download-button-version';
-                        verSpan.textContent = d.version;
-                        a.appendChild(verSpan);
-                    }
-
-                    // Год только с кнопки (d.year). Если его нет, вообще не показываем.
-                    const buttonYear = (d.year !== undefined && d.year !== null)
-                        ? String(d.year)
-                        : null;
-
-                    if (buttonYear) {
-                        const yearSpan = document.createElement('span');
-                        yearSpan.className = 'download-button-year';
-                        yearSpan.textContent = buttonYear;
-                        a.appendChild(yearSpan);
-                    }
-
-                    downloads.appendChild(a);
-                });
-            } else if (downloadsSection) {
-                downloadsSection.style.display = 'none';
-            }
-        } catch (err) {
-            console.error('Ошибка загрузки infogame.json:', err);
         }
     })();
 </script>

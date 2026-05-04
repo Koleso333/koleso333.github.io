@@ -205,18 +205,6 @@ body:not(.loading) .app-loader {
     margin-top: 20px;
 }
 
-/* Анимация появления секций */
-.observe {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.section--visible.observe {
-    opacity: 1;
-    transform: translateY(0);
-}
-
 .section-title {
     font-size: 20px;
     margin-bottom: 10px;
