@@ -5,21 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8258cef8-2d51-4b92-9a18-d603261faef4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/content/content.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/games.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/news.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/baltika-clicker/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/games/baltika-clicker/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/baltika-clicker/infogame.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/cex-drochilni/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/games/cex-drochilni/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/cex-drochilni/infogame.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/dmk-old/banner.png" beforeDir="false" afterPath="$PROJECT_DIR$/games/dmk-old/banner.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/dmk-old/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/games/dmk-old/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/dmk-old/infogame.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/dmk/banner.png" beforeDir="false" afterPath="$PROJECT_DIR$/games/dmk/banner.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/dmk/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/games/dmk/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games/dmk/infogame.json" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
