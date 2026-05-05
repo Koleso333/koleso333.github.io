@@ -20,6 +20,15 @@
         <span class="game-year-tag" id="game-year-tag">2026</span>
     </header>
 
+    <section class="game-section" id="game-description-section">
+        <h2 class="game-section-title">Описание</h2>
+        <p class="game-description-block" id="game-description-block">
+            Твоя задача - убежать от кирпича что-бы не сдохнуть.
+            Данная игра является перезагрузкой на Godot.
+
+            Обновления выходят по мере разработки, ждите!</p>
+    </section>
+
     <section class="game-section" id="game-downloads-section">
         <h2 class="game-section-title">Скачать</h2>
         <div class="game-downloads" id="game-downloads">
@@ -121,6 +130,277 @@
                 applyZoom();
             });
         }
+    })();
+</script>
+
+<style>
+    #mg-brick {
+        position: fixed;
+        width: 103px;
+        height: 83px;
+        z-index: 4000;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+    #mg-timer {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        font-size: 20px;
+        font-family: 'Mitr', 'Roboto', system-ui, sans-serif;
+        color: #fff;
+        z-index: 4000;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+        user-select: none;
+    }
+    .mg-extra {
+        position: fixed;
+        width: 103px;
+        height: 83px;
+        z-index: 3999;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+</style>
+
+<img src="kirpich.png" alt="" id="mg-brick" draggable="false">
+<div id="mg-timer"></div>
+
+<script>
+    (function () {
+        var brick = document.getElementById('mg-brick');
+        var timerEl = document.getElementById('mg-timer');
+        if (!brick || !timerEl) return;
+
+        var isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isMobile) {
+            brick.style.display = 'none';
+            return;
+        }
+
+        var W = 103;
+        var H = 83;
+        var HW = W / 2;
+        var HH = H / 2;
+        var MARGIN = 24;
+        var G = 0.7;
+        var DAMP = 0.99;
+        var INVINCIBLE = 1500;
+        var ROT_SPEED = 1.5;
+        var FALL_G = 0.5;
+        var FALL_ROT = 3;
+
+        var state = 'idle';
+        var bx, by, vx, vy, angle, startMs, fallVy, animId;
+        var mx = window.innerWidth / 2;
+        var my = window.innerHeight / 2;
+        var extraList = [];
+        var spawnTimer = 0;
+        var spawnInterval = 5000;
+
+        document.addEventListener('mousemove', function (e) {
+            mx = e.clientX;
+            my = e.clientY;
+        });
+
+        function restLeft() { return Math.round(window.innerWidth - MARGIN - W); }
+        function restTop()  { return Math.round(window.innerHeight - MARGIN - H); }
+
+        function placeBrick(l, t, r) {
+            brick.style.left = l + 'px';
+            brick.style.top = t + 'px';
+            brick.style.transform = 'rotate(' + r + 'deg)';
+        }
+
+        function toRest() {
+            brick.style.transition = 'none';
+            placeBrick(restLeft(), restTop(), 0);
+            brick.style.cursor = 'pointer';
+            state = 'idle';
+        }
+
+        toRest();
+
+        function spawnExtra() {
+            var edge = Math.floor(Math.random() * 4);
+            var x, y;
+            switch (edge) {
+                case 0: x = Math.random() * window.innerWidth;          y = -HH;           break;
+                case 1: x = window.innerWidth + HW;                    y = Math.random() * window.innerHeight; break;
+                case 2: x = Math.random() * window.innerWidth;          y = window.innerHeight + HH; break;
+                case 3: x = -HW;                                        y = Math.random() * window.innerHeight; break;
+            }
+            var el = document.createElement('img');
+            el.src = 'kirpich.png';
+            el.className = 'mg-extra';
+            el.style.left = (x - HW) + 'px';
+            el.style.top = (y - HH) + 'px';
+            document.body.appendChild(el);
+            extraList.push({
+                el: el,
+                x: x, y: y,
+                vx: 0, vy: 0,
+                angle: Math.random() * 360,
+                g: 0.35 + Math.random() * 0.5,
+                damp: 0.985 + Math.random() * 0.01,
+                rot: 0.5 + Math.random() * 2
+            });
+        }
+
+        function clearExtras() {
+            for (var i = 0; i < extraList.length; i++) extraList[i].el.remove();
+            extraList = [];
+        }
+
+        function updateExtras(dt) {
+            for (var i = extraList.length - 1; i >= 0; i--) {
+                var eb = extraList[i];
+                var dx = mx - eb.x;
+                var dy = my - eb.y;
+                var a = Math.atan2(dy, dx);
+                eb.vx += Math.cos(a) * eb.g;
+                eb.vy += Math.sin(a) * eb.g;
+                eb.vx *= eb.damp;
+                eb.vy *= eb.damp;
+                eb.x += eb.vx;
+                eb.y += eb.vy;
+                eb.angle += eb.rot;
+                eb.el.style.left = Math.round(eb.x - HW) + 'px';
+                eb.el.style.top = Math.round(eb.y - HH) + 'px';
+                eb.el.style.transform = 'rotate(' + eb.angle + 'deg)';
+                if (eb.x < -200 || eb.x > window.innerWidth + 200 ||
+                    eb.y < -200 || eb.y > window.innerHeight + 200) {
+                    eb.el.remove();
+                    extraList.splice(i, 1);
+                }
+            }
+        }
+
+        function hitCheck() {
+            return Math.abs(mx - bx) < HW && Math.abs(my - by) < HH;
+        }
+
+        function extraHitCheck() {
+            for (var i = 0; i < extraList.length; i++) {
+                var eb = extraList[i];
+                if (Math.abs(mx - eb.x) < HW && Math.abs(my - eb.y) < HH) return true;
+            }
+            return false;
+        }
+
+        var returnStartY, returnStartMs, returnTargetY, returnTargetL;
+
+        function startReturn() {
+            state = 'returning';
+            returnTargetL = restLeft();
+            returnTargetY = restTop();
+            returnStartY = window.innerHeight + H;
+            returnStartMs = performance.now();
+            placeBrick(returnTargetL, returnStartY, 0);
+            animId = requestAnimationFrame(tick);
+        }
+
+        var prevTs = 0;
+
+        function tick(ts) {
+            var dt = prevTs ? ts - prevTs : 16;
+            prevTs = ts;
+
+            if (state === 'returning') {
+                var elapsed = ts - returnStartMs;
+                var dur = 600;
+                var t = Math.min(elapsed / dur, 1);
+                var eased = 1 - Math.pow(1 - t, 3);
+                var curTop = returnStartY + (returnTargetY - returnStartY) * eased;
+                placeBrick(returnTargetL, Math.round(curTop), (1 - t) * 360);
+                if (t >= 1) {
+                    placeBrick(returnTargetL, returnTargetY, 0);
+                    brick.style.cursor = 'pointer';
+                    state = 'idle';
+                }
+                animId = requestAnimationFrame(tick);
+                return;
+            }
+
+            if (state === 'chasing') {
+                var dx = mx - bx;
+                var dy = my - by;
+                var a = Math.atan2(dy, dx);
+
+                vx += Math.cos(a) * G;
+                vy += Math.sin(a) * G;
+                vx *= DAMP;
+                vy *= DAMP;
+                bx += vx;
+                by += vy;
+                angle += ROT_SPEED;
+
+                placeBrick(Math.round(bx - HW), Math.round(by - HH), angle);
+
+                var elapsed = performance.now() - startMs;
+                timerEl.textContent = (elapsed / 1000).toFixed(1) + ' сек';
+
+                spawnTimer += dt;
+                if (spawnTimer >= spawnInterval) {
+                    spawnTimer -= spawnInterval;
+                    spawnExtra();
+                }
+                updateExtras(dt);
+
+                if (elapsed > INVINCIBLE && (hitCheck() || extraHitCheck())) {
+                    state = 'falling';
+                    fallVy = -4;
+                    clearExtras();
+                    timerEl.style.opacity = '0';
+                    animId = requestAnimationFrame(tick);
+                    return;
+                }
+
+                animId = requestAnimationFrame(tick);
+            } else if (state === 'falling') {
+                fallVy += FALL_G;
+                by += fallVy;
+                angle += FALL_ROT;
+                placeBrick(Math.round(bx - HW), Math.round(by - HH), angle);
+
+                if (by > window.innerHeight + H) {
+                    startReturn();
+                    return;
+                }
+
+                animId = requestAnimationFrame(tick);
+            }
+        }
+
+        brick.addEventListener('click', function () {
+            if (state !== 'idle') return;
+            state = 'chasing';
+            var rl = restLeft();
+            var rt = restTop();
+            bx = rl + HW;
+            by = rt + HH;
+            var perpA = Math.atan2(my - by, mx - bx) + Math.PI / 2 * (Math.random() > 0.5 ? 1 : -1);
+            var initSpd = 10 + Math.random() * 5;
+            vx = Math.cos(perpA) * initSpd;
+            vy = Math.sin(perpA) * initSpd;
+            angle = 0;
+            prevTs = 0;
+            spawnTimer = 0;
+            startMs = performance.now();
+            brick.style.transition = 'none';
+            brick.style.cursor = 'default';
+            timerEl.style.opacity = '1';
+            clearExtras();
+            animId = requestAnimationFrame(tick);
+        });
+
+        window.addEventListener('resize', function () {
+            if (state === 'idle') placeBrick(restLeft(), restTop(), 0);
+        });
     })();
 </script>
 </body>

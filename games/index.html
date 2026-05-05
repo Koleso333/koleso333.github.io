@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Игры — Koleso</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../icon.ico" type="image/x-icon">
+
+    <style>
+        .games-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .games-adult-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 13px;
+            opacity: 0.85;
+            white-space: nowrap;
+        }
+
+        .games-adult-label {
+            user-select: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #666;
+            transition: 0.2s;
+            border-radius: 999px;
+        }
+
+        .switch-slider::before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            top: 2px;
+            background-color: #fff;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
+
+        .switch input:checked + .switch-slider {
+            background-color: #e53935;
+        }
+
+        .switch input:checked + .switch-slider::before {
+            transform: translateX(20px);
+        }
+
+        .game-card--hidden-adult {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .games-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<main class="page">
+
+    <section id="games" class="section card">
+        <div class="games-header">
+            <h2 class="section-title" id="games-title">Игры</h2>
+
+            <div class="games-adult-toggle">
+                <span class="games-adult-label">Показать 18+</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-18plus">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <p class="section-text" id="games-text">Это мои игры! Скоро их тут будет больше.</p>
+
+        <div class="games-grid" id="games-grid">
+            <a href="cex-drochilni/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="true">
+                <img src="cex-drochilni/logo.png" alt="Цex дрочильни" class="game-card-logo">
+                <div class="game-card-title">Цex дрочильни</div>
+            </a>
+            <a href="baltika-clicker/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
+                <img src="baltika-clicker/logo.png" alt="Балтика Кликер Alpha" class="game-card-logo">
+                <div class="game-card-title">Балтика Кликер Alpha</div>
+            </a>
+            <a href="dmk-old/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
+                <img src="dmk-old/logo.png" alt="Догони меня, кирпич! OLD" class="game-card-logo">
+                <div class="game-card-title">Догони меня, кирпич! OLD</div>
+            </a>
+            <a href="dmk/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
+                <img src="dmk/logo.png" alt="Догони меня, кирпич! RELOAD" class="game-card-logo">
+                <div class="game-card-title">Догони меня, кирпич! RELOAD</div>
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    (function () {
+        const gamesContainer = document.getElementById('games-grid');
+        const adultToggle    = document.getElementById('toggle-18plus');
+
+        const ADULT_TOGGLE_KEY = 'gamesShow18Plus';
+        let showAdultGames = false;
+
+        function getSavedAdultToggle() {
+            try {
+                return localStorage.getItem(ADULT_TOGGLE_KEY);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function setSavedAdultToggle(value) {
+            try {
+                localStorage.setItem(ADULT_TOGGLE_KEY, value);
+            } catch (e) {
+            }
+        }
+
+        function applyAdultFilterToGames() {
+            if (!gamesContainer) return;
+            const cards = gamesContainer.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                const isAdult = card.dataset.adult === 'true';
+                if (isAdult && !showAdultGames) {
+                    card.classList.add('game-card--hidden-adult');
+                } else {
+                    card.classList.remove('game-card--hidden-adult');
+                }
+            });
+        }
+
+        function onAdultToggleChange(e) {
+            const checked = e.target.checked;
+
+            if (checked && !showAdultGames) {
+                const ok = window.confirm(
+                    'Эта настройка покажет игры с контентом 18+.\n' +
+                    'Подтвердите, что вам уже есть 18 лет.'
+                );
+                if (!ok) {
+                    e.target.checked = false;
+                    return;
+                }
+            }
+
+            showAdultGames = checked;
+            setSavedAdultToggle(showAdultGames ? '1' : '0');
+            applyAdultFilterToGames();
+        }
+
+        if (adultToggle) {
+            const saved = getSavedAdultToggle();
+            showAdultGames = saved === '1';
+            adultToggle.checked = showAdultGames;
+            adultToggle.addEventListener('change', onAdultToggleChange);
+        }
+
+        applyAdultFilterToGames();
+    })();
+</script>
+</body>
+</html>
