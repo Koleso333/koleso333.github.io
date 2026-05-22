@@ -9,16 +9,12 @@
     <link rel="icon" href="icon.ico" type="image/x-icon">
 
     <style>
-        /* ===== ЗАГРУЗЧИК / ЧЁРНЫЙ ЭКРАН ===== */
-
-        /* Прячем основной контент, пока body.loading */
         body.loading .site-header,
         body.loading .page,
         body.loading .footer {
             visibility: hidden;
         }
 
-        /* Чёрный экран / лоадер поверх всего */
         .app-loader {
             position: fixed;
             inset: 0;
@@ -33,7 +29,6 @@
             padding: 1.5rem;
         }
 
-        /* Когда загрузились данные — прячем лоадер */
         body:not(.loading) .app-loader {
             display: none;
         }
@@ -44,8 +39,6 @@
             font-size: 15px;
             opacity: 0.9;
         }
-
-        /* ===== ПЕРЕКЛЮЧАТЕЛЬ 18+ ДЛЯ ИГР ===== */
 
         .games-header {
             display: flex;
@@ -67,7 +60,6 @@
             user-select: none;
         }
 
-        /* Базовый переключатель */
         .switch {
             position: relative;
             display: inline-block;
@@ -103,14 +95,13 @@
         }
 
         .switch input:checked + .switch-slider {
-            background-color: #e53935; /* красный, 18+ */
+            background-color: #e53935;
         }
 
         .switch input:checked + .switch-slider::before {
             transform: translateX(20px);
         }
 
-        /* Скрытые 18+ игры */
         .game-card--hidden-adult {
             display: none !important;
         }
@@ -144,18 +135,15 @@
 
 <main class="page">
 
-    <!-- ОБО МНЕ -->
     <section id="about" class="section card">
         <h2 class="section-title" id="about-title">Обо мне</h2>
         <p class="section-text" id="about-text">Меня зовут <strong>Колесо</strong>. Я начинающий разработчик игр, люблю что‑либо создавать и экспериментировать. Этот сайт считай тоже эксперимент.</p>
     </section>
 
-    <!-- ИГРЫ -->
     <section id="games" class="section card">
         <div class="games-header">
             <h2 class="section-title" id="games-title">Игры</h2>
 
-            <!-- переключатель 18+ справа от заголовка -->
             <div class="games-adult-toggle">
                 <span class="games-adult-label">Показать 18+</span>
                 <label class="switch">
@@ -176,18 +164,13 @@
                 <img src="games/baltika-clicker/logo.png" alt="Балтика Кликер Alpha" class="game-card-logo">
                 <div class="game-card-title">Балтика Кликер Alpha</div>
             </a>
-            <a href="games/dmk-old/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
-                <img src="games/dmk-old/logo.png" alt="Догони меня, кирпич! OLD" class="game-card-logo">
-                <div class="game-card-title">Догони меня, кирпич! OLD</div>
-            </a>
             <a href="games/dmk/index.html" target="_blank" rel="noopener noreferrer" class="game-card" data-adult="false">
-                <img src="games/dmk/logo.png" alt="Догони меня, кирпич! RELOAD" class="game-card-logo">
-                <div class="game-card-title">Догони меня, кирпич! RELOAD</div>
+                <img src="games/dmk-old/logo.png" alt="Догони меня, кирпич!" class="game-card-logo">
+                <div class="game-card-title">Догони меня, кирпич!</div>
             </a>
         </div>
     </section>
 
-    <!-- НОВОСТИ -->
     <section id="news" class="section card">
         <h2 class="section-title" id="news-title">Новости</h2>
 
@@ -223,7 +206,6 @@
         </div>
     </section>
 
-    <!-- КОНТАКТЫ -->
     <section id="contacts" class="section card">
         <h2 class="section-title" id="contacts-title">Контакты со мной</h2>
         <ul class="contacts-list" id="contacts-list">
@@ -245,7 +227,6 @@
 
 <script>
     (function () {
-        // Год в подвале
         const yearEl = document.getElementById('year');
         if (yearEl) {
             yearEl.textContent = new Date().getFullYear();
@@ -257,7 +238,6 @@
         const ADULT_TOGGLE_KEY = 'gamesShow18Plus';
         let showAdultGames = false;
 
-        // ===== Работа с localStorage для 18+ =====
         function getSavedAdultToggle() {
             try {
                 return localStorage.getItem(ADULT_TOGGLE_KEY);
@@ -270,7 +250,6 @@
             try {
                 localStorage.setItem(ADULT_TOGGLE_KEY, value);
             } catch (e) {
-                // игнорируем ошибки (например, в приватном режиме)
             }
         }
 
@@ -290,7 +269,6 @@
         function onAdultToggleChange(e) {
             const checked = e.target.checked;
 
-            // Включение 18+ — показать предупреждение
             if (checked && !showAdultGames) {
                 const ok = window.confirm(
                     'Эта настройка покажет игры с контентом 18+.\n' +
@@ -307,7 +285,6 @@
             applyAdultFilterToGames();
         }
 
-        // Инициализация состояния переключателя 18+ из localStorage
         if (adultToggle) {
             const saved = getSavedAdultToggle();
             showAdultGames = saved === '1';
