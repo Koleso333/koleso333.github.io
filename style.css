@@ -99,7 +99,7 @@ body:not(.loading) .app-loader {
     width: var(--hero-square);
     height: var(--hero-square);
     background: #ffffff;
-    border-radius: 8px;
+    border-radius: calc(var(--hero-square) * 0.073);
     z-index: 1;
 }
 
