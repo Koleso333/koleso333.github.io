@@ -1,7 +1,7 @@
 (function () {
     // Держим закругление углов квадратиков строго пропорциональным
     // их реальному пиксельному размеру при любом масштабе/ресайзе.
-    var RADIUS_RATIO = 0.073;
+    var RADIUS_RATIO = 0.11;
 
     function updateHeroRadius() {
         var squares = document.querySelectorAll('.hero-square');
