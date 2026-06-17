@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lunaura</title>
+<link rel="icon" href="lunaura.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Roboto:wght@400;700&display=swap">
+<style>
+:root{
+  --fg:#DBDBDB;
+  --bg:#000;
+  --tile:54px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-weight:700;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* always reserve the scrollbar track so opening/closing the panel never
+   shifts the layout, and give it a custom thin dark-theme look */
+html{
+  overflow-y:scroll;
+  scrollbar-gutter:stable;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(219,219,219,.22) transparent;
+}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{
+  background:rgba(219,219,219,.22);
+  border-radius:8px;
+  border:3px solid transparent;
+  background-clip:content-box;
+}
+::-webkit-scrollbar-thumb:hover{
+  background:rgba(219,219,219,.4);
+  background-clip:content-box;
+}
+
+/* ---------- header ---------- */
+.topbar{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:60;
+  overflow:hidden;
+}
+.alert{
+  height:36px;line-height:36px;
+  padding:0 26px;
+  text-align:center;
+  font-size:13px;letter-spacing:.02em;
+  color:#fff;
+  background:linear-gradient(180deg,#c0241f,#9c1410);
+  transition:margin-top .6s cubic-bezier(.22,.61,.36,1);
+}
+body.models-open .alert{margin-top:-36px}
+.alert-track{display:inline-block;white-space:nowrap}
+.alert-track .alert-txt:nth-child(2){display:none}
+.hdr{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 26px;
+  z-index:60;
+  backdrop-filter:blur(14px) saturate(120%);
+  -webkit-backdrop-filter:blur(14px) saturate(120%);
+  background:rgba(0,0,0,.4);
+  border-bottom:1px solid rgba(219,219,219,.1);
+}
+.hdr img{height:34px;display:block;user-select:none;-webkit-user-drag:none}
+.btn{
+  font-family:'Roboto',system-ui,sans-serif;
+  font-weight:700;
+  background:#fff;color:#000;border:none;
+  border-radius:10px;
+  padding:10px 20px;
+  font-size:14px;
+  cursor:pointer;
+  opacity:.94;
+  letter-spacing:.01em;
+  transition:opacity .45s ease,transform .45s ease;
+}
+.btn:hover{opacity:1}
+body.models-open .btn{opacity:0;pointer-events:none}
+
+/* ---------- pixel tiles ---------- */
+.tile{animation:shimmer var(--dur,4s) ease-in-out infinite;will-change:filter}
+@keyframes shimmer{
+  0%,100%{filter:brightness(.5)}
+  50%{filter:brightness(1.7)}
+}
+
+/* big edge frame: a sideways "mountain" hugging both side edges */
+.frame{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:160vh;   /* real height set by JS */
+  pointer-events:none;
+  z-index:1;
+  display:grid;
+  gap:0;
+}
+/* tiles slide outward when the models panel is open (seamless: same elements) */
+.frame>div{transition:transform .65s cubic-bezier(.22,.61,.36,1)}
+body.models-open .frame .f-left{transform:translateX(calc(var(--tile) * -2))}
+body.models-open .frame .f-right{transform:translateX(calc(var(--tile) * 2))}
+
+main{position:relative;z-index:5;transition:opacity .5s ease}
+body.models-open main{opacity:0;pointer-events:none}
+/* lock background scroll while the models panel is open (iOS-safe).
+   kept on its own class so it can persist through the close animation.
+   html keeps its always-on scroll track (no overflow:hidden) so locking
+   doesn't remove the gutter and shift the layout — body:fixed does the lock */
+body.scroll-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
+}
+.hero h1{
+  font-size:clamp(38px,6vw,74px);
+  letter-spacing:-.02em;
+  text-align:center;
+  line-height:1.18;
+  max-width:13ch;
+  position:relative;
+  z-index:5;
+}
+
+/* ---------- manifest ---------- */
+.manifest{
+  position:relative;
+  z-index:6;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:4vh 32px;
+  gap:16vh;
+}
+.row{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
+  width:100%;
+  max-width:680px;
+}
+.row p{
+  font-size:clamp(21px,2.5vw,31px);
+  line-height:1.5;
+  max-width:20ch;
+  text-align:center;
+  position:relative;
+  z-index:3;
+}
+
+/* row 2 — left-aligned block: blob + text */
+.row--left{
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  gap:30px;
+  max-width:760px;
+}
+.row--left p{text-align:left;max-width:28ch;line-height:1.45}
+
+/* tiny inline pixel decorations */
+.bits{display:flex;gap:4px}
+.bits .tile{width:9px;height:9px}
+
+/* staircase blob */
+.blob{
+  display:grid;
+  grid-template-columns:repeat(3,30px);
+  grid-auto-rows:30px;
+  gap:0;
+  flex:0 0 auto;
+}
+.blob>div{width:100%;height:100%}
+
+/* horizontal bars behind row 3 */
+.bars{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:min(560px,86%);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  z-index:1;
+}
+.bars .bar{height:34px;animation:shimmer var(--dur,5s) ease-in-out infinite}
+
+/* ---------- outro ---------- */
+.outro{
+  position:relative;
+  z-index:6;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:12vh 32px 18vh;
+  gap:32px;
+}
+.ending{
+  display:flex;align-items:center;gap:12px;
+  font-size:12px;letter-spacing:.28em;color:#dbdbdb45;
+}
+.ending .bits .tile{width:8px;height:8px}
+.outro p{
+  font-size:clamp(15px,1.6vw,20px);
+  line-height:1.7;
+  max-width:44ch;
+  text-align:center;
+  color:#dbdbdb70;
+}
+
+/* ---------- animated dim ---------- */
+.dim{
+  position:fixed;inset:0;
+  background:#000;
+  opacity:0;
+  z-index:40;
+  pointer-events:none;
+  transition:opacity .6s ease;
+}
+body.models-open .dim{opacity:.6}
+
+/* ---------- models overlay ---------- */
+.models{
+  position:fixed;inset:0;
+  z-index:45;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:96px 26px 40px;
+  /* clip so a scaled panel (incl. a glitched/interrupted transition) can never
+     push this fixed overlay wider than the viewport */
+  overflow:hidden;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .6s ease;
+}
+body.models-open .models{opacity:1;pointer-events:auto}
+
+.panel{
+  position:relative;
+  width:min(1040px,100%);
+  max-width:100%;
+  min-width:0;
+  height:min(620px,80vh);
+  display:flex;
+  border:1px solid rgba(219,219,219,.14);
+  border-radius:18px;
+  overflow:hidden;
+  background:rgba(10,10,10,.72);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);
+  transform:scale(1.12);
+  transition:transform .55s cubic-bezier(.22,.61,.36,1);
+}
+body.models-open .panel{transform:scale(1)}
+.close{
+  position:absolute;top:14px;right:16px;z-index:3;
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(219,219,219,.06);
+  border:1px solid rgba(219,219,219,.16);
+  border-radius:9px;
+  color:var(--fg);
+  font-family:'Roboto',system-ui,sans-serif;
+  font-size:16px;line-height:1;
+  cursor:pointer;
+  transition:background .2s ease,border-color .2s ease;
+}
+.close:hover{background:rgba(219,219,219,.14);border-color:rgba(219,219,219,.4)}
+
+/* ----- left list ----- */
+.list{
+  flex:0 0 280px;
+  min-width:0;
+  border-right:1px solid rgba(219,219,219,.12);
+  overflow-y:auto;
+  padding:10px;
+}
+.list-h{
+  font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:#dbdbdb55;padding:12px 12px 14px;
+}
+.item{
+  display:flex;align-items:center;gap:12px;
+  min-width:0;
+  padding:11px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  color:#dbdbdbb0;
+  transition:background .2s ease,color .2s ease;
+}
+.item:hover{background:rgba(219,219,219,.06);color:var(--fg)}
+.item.active{background:rgba(219,219,219,.12);color:var(--fg)}
+.item img{width:26px;height:26px;object-fit:contain;flex:0 0 auto}
+.item .ph{width:26px;height:26px;flex:0 0 auto;background:rgba(219,219,219,.12)}
+.item span{flex:1 1 auto;min-width:0;font-size:14px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ----- right detail ----- */
+.detail{
+  flex:1;
+  min-width:0;
+  overflow-y:auto;
+  padding:38px 40px;
+}
+.detail-head{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+.detail-head img{width:64px;height:64px;object-fit:contain;flex:0 0 auto}
+.detail-head .ph{width:64px;height:64px;background:rgba(219,219,219,.1);flex:0 0 auto}
+.detail h1{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-weight:700;
+  font-size:clamp(24px,3vw,34px);
+  letter-spacing:-.01em;
+  line-height:1.1;
+}
+.detail .desc{
+  font-family:'Roboto',system-ui,sans-serif;
+  font-weight:400;
+  font-size:16px;
+  line-height:1.6;
+  color:#dbdbdbcc;
+  max-width:60ch;
+  margin-bottom:30px;
+}
+.meta{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:14px;
+}
+.meta .cell{
+  border:1px solid rgba(219,219,219,.12);
+  border-radius:12px;
+  padding:14px 16px;
+}
+.meta .k{
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:#dbdbdb55;margin-bottom:7px;
+}
+.meta .v{font-size:18px;letter-spacing:-.01em}
+
+.status,.ns{
+  font-family:'Roboto',system-ui,sans-serif;
+  font-weight:400;
+  color:#dbdbdb80;font-size:15px;
+  padding:38px 40px;
+  line-height:1.6;
+}
+.ns a{color:var(--fg);text-decoration:underline}
+
+@media(max-width:760px){
+  /* marquee: smooth back-and-forth scroll for the long banner text */
+  .alert{padding:0 14px}
+  .alert-track{display:flex;gap:64px;animation:marquee 16s linear infinite;will-change:transform}
+  .alert-track .alert-txt:nth-child(2){display:inline}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 32px))}}
+
+  .models{padding:70px 14px 24px}
+  /* stack vertically: close band on top, vertical model list, description below */
+  .panel{flex-direction:column;height:min(680px,88vh);padding-top:48px}
+  /* close lives in the reserved top band */
+  .close{top:9px;right:12px}
+  /* list = vertical, full-width, capped height with its own scroll */
+  .list{
+    flex:0 0 auto;
+    max-height:36vh;
+    overflow-y:auto;
+    border-right:none;
+    border-bottom:1px solid rgba(219,219,219,.12);
+    padding:8px;
+  }
+  .list-h{display:none}
+  /* description below the list, takes the rest, scrolls on its own */
+  .detail{flex:1 1 auto;min-height:0;padding:24px 22px}
+  .detail-head img,.detail-head .ph{width:52px;height:52px}
+}
+</style>
+<noscript><style>
+  /* no JS (crawlers, AI, etc.): open the panel and show a repo link */
+  .btn{display:none}
+  .dim{opacity:.6}
+  .models{opacity:1;transform:none;pointer-events:auto}
+  .panel{height:auto;min-height:160px}
+  .list,.close{display:none}
+  .detail .status{display:none}
+</style></noscript>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="alert" id="alert"><div class="alert-track"><span class="alert-txt">На данный момент клиенты с ИИ aura в разработке. Ожидайте...</span><span class="alert-txt" aria-hidden="true">На данный момент клиенты с ИИ aura в разработке. Ожидайте...</span></div></div>
+  <header class="hdr">
+    <img src="lunaura-logo.png" alt="Lunaura">
+    <button class="btn" id="toModels">Последние модели</button>
+  </header>
+</div>
+
+<div class="frame" id="frame"></div>
+
+<main>
+  <section class="hero">
+    <h1>По настоящему AI наводка</h1>
+  </section>
+
+  <section class="manifest">
+    <div class="row">
+      <div class="bits" data-n="5"></div>
+      <p>В отличии от других, мы предлагаем более продвинутое AI решение в лице Transformer. Истинное подражание.</p>
+    </div>
+
+    <div class="row row--left">
+      <div class="blob" data-blob></div>
+      <p>Контекстное окно из тиков. Помнит и предиктит.</p>
+    </div>
+
+    <div class="row">
+      <div class="bars" data-bars="5"></div>
+      <p>Главное не обходы и пена. Главное&nbsp;— человечность.</p>
+    </div>
+  </section>
+
+  <section class="outro">
+    <div class="ending">
+      <div class="bits" data-n="5"></div>
+      <span>ending</span>
+      <div class="bits" data-n="5"></div>
+    </div>
+    <p>Lunaura находится на стадии разработки. На данный момент последняя ветка Luna-Spark предоставляет возможность попробовать модель в реале, а не на словах.</p>
+  </section>
+</main>
+
+<!-- animated darkening + models overlay (same page => seamless) -->
+<div class="dim" id="dim"></div>
+<div class="models" id="models">
+  <div class="panel">
+    <button class="close" id="closeModels" aria-label="Закрыть">✕</button>
+    <aside class="list" id="list">
+      <div class="list-h">Модели</div>
+    </aside>
+    <section class="detail" id="detail">
+      <div class="status">Загрузка моделей…</div>
+      <noscript>
+        <div class="ns">JS в данном окружении недоступно — список моделей не загрузить. Перейдите на репозиторий: <a href="https://github.com/Koleso333/AuraRepo">github.com/Koleso333/AuraRepo</a></div>
+      </noscript>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  // mid-weighted gray
+  function shade(min,max){
+    min=min||40; max=max||205;
+    const v=min+Math.floor(Math.pow(Math.random(),1.1)*(max-min));
+    return 'rgb('+v+','+v+','+v+')';
+  }
+  function place(cell,min,max,forceAnim){
+    cell.style.background=shade(min,max);
+    if(forceAnim || Math.random()<0.6){
+      cell.classList.add('tile');
+      const dur=3+Math.random()*3.5;
+      cell.style.setProperty('--dur',dur.toFixed(2)+'s');
+      cell.style.animationDelay=(-(Math.random()*dur)).toFixed(2)+'s';
+    }
+  }
+
+  /* ----- sideways mountain hugging both side edges; peak on the 16:9 fold ----- */
+  const frame=document.getElementById('frame');
+  const TILE=54;
+  function buildFrame(){
+    frame.innerHTML='';
+    const W=window.innerWidth;
+    const fold=W*9/16;
+    const cols=Math.ceil(W/TILE);
+    const peakRow=Math.max(1,Math.round(fold/TILE));
+    const fallRows=Math.round(peakRow*0.62);
+    const rows=peakRow+fallRows;
+    frame.style.height=(rows*TILE)+'px';
+    frame.style.gridTemplateColumns='repeat('+cols+',1fr)';
+    frame.style.gridAutoRows=TILE+'px';
+    document.documentElement.style.setProperty('--tile',TILE+'px');
+
+    const maxReach=Math.max(4,Math.round(cols*0.18));
+    const topReach=Math.max(3,Math.round(cols*0.12));
+
+    const reachOf=[];
+    for(let r=0;r<rows;r++){
+      let base;
+      if(r<=peakRow){const t=r/peakRow;base=topReach+(maxReach-topReach)*t;}
+      else{const t=(r-peakRow)/fallRows;base=maxReach*(1-t);}
+      const jit=(Math.sin(r*1.3)+Math.sin(r*0.7+1.5))*0.9;
+      reachOf[r]=Math.max(0,Math.round(base+jit));
+    }
+
+    const frag=document.createDocumentFragment();
+    for(let r=0;r<rows;r++){
+      const reach=reachOf[r];
+      for(let c=0;c<cols;c++){
+        const cell=document.createElement('div');
+        const edge=Math.min(c,cols-1-c);
+        if(edge<reach){
+          place(cell,32,205);
+          cell.classList.add(c<cols/2?'f-left':'f-right');
+        }
+        frag.appendChild(cell);
+      }
+    }
+    frame.appendChild(frag);
+  }
+
+  /* ----- inline bit rows ----- */
+  function buildBits(){
+    document.querySelectorAll('.bits').forEach(b=>{
+      b.innerHTML='';
+      const n=parseInt(b.dataset.n||'5',10);
+      for(let i=0;i<n;i++) place(b.appendChild(document.createElement('div')),70,200,true);
+    });
+  }
+
+  /* ----- staircase blob ----- */
+  const BLOB=[0,0,1, 0,1,1, 1,1,1];
+  function buildBlob(){
+    document.querySelectorAll('[data-blob]').forEach(b=>{
+      b.innerHTML='';
+      BLOB.forEach(on=>{
+        const cell=document.createElement('div');
+        if(on) place(cell,35,200,true);
+        b.appendChild(cell);
+      });
+    });
+  }
+
+  /* ----- horizontal bars ----- */
+  function buildBars(){
+    document.querySelectorAll('[data-bars]').forEach(b=>{
+      b.innerHTML='';
+      const n=parseInt(b.dataset.bars||'5',10);
+      for(let i=0;i<n;i++){
+        const bar=document.createElement('div');
+        bar.className='bar';
+        bar.style.background=shade(26,80);
+        const bdur=4+Math.random()*3;
+        bar.style.setProperty('--dur',bdur.toFixed(2)+'s');
+        bar.style.animationDelay=(-(Math.random()*bdur)).toFixed(2)+'s';
+        b.appendChild(bar);
+      }
+    });
+  }
+
+  buildFrame();buildBits();buildBlob();buildBars();
+  let t;
+  window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(buildFrame,160)});
+
+  /* ====================== models panel ====================== */
+  const BASE='https://raw.githubusercontent.com/Koleso333/AuraRepo/main/';
+  const listEl=document.getElementById('list');
+  const detailEl=document.getElementById('detail');
+  const fmt=n=>(typeof n==='number'?n.toLocaleString('ru-RU'):n);
+  let loaded=false;
+
+  function render(m,dir){
+    const icon=m.icon?BASE+dir+'/'+m.icon:null;
+    const meta=[];
+    if(m.parameters!=null) meta.push(['Параметры',fmt(m.parameters)]);
+    if(m.date) meta.push(['Дата выхода',m.date]);
+    if(m.author) meta.push(['Автор',m.author]);
+    if(m.file) meta.push(['Файл',m.file]);
+    detailEl.innerHTML=
+      '<div class="detail-head">'+
+        (icon?'<img src="'+icon+'" alt="" onerror="this.outerHTML=\'<div class=ph></div>\'">':'<div class="ph"></div>')+
+        '<h1>'+(m.name||dir)+'</h1>'+
+      '</div>'+
+      (m.desc?'<p class="desc">'+m.desc+'</p>':'')+
+      (meta.length?'<div class="meta">'+meta.map(x=>
+        '<div class="cell"><div class="k">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>'
+      ).join('')+'</div>':'');
+  }
+
+  function select(li,m,dir){
+    listEl.querySelectorAll('.item').forEach(x=>x.classList.remove('active'));
+    li.classList.add('active');
+    render(m,dir);
+  }
+
+  function loadModels(){
+    if(loaded) return; loaded=true;
+    // bust GitHub's CDN cache (~5 min TTL) so repo edits show up immediately
+    const bust='?t='+Date.now();
+    const opt={cache:'no-store'};
+    fetch(BASE+'dir.json'+bust,opt)
+      .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+      .then(dir=>Promise.all(Object.entries(dir).map(([key,path])=>{
+        const folder=path.split('/')[0];
+        return fetch(BASE+path+bust,opt).then(r=>r.ok?r.json():null)
+          .then(m=>({folder,m})).catch(()=>({folder,m:null}));
+      })))
+      .then(rows=>{
+        rows=rows.filter(x=>x.m);
+        if(!rows.length){detailEl.innerHTML='<div class="status">Модели не найдены.</div>';return;}
+        rows.forEach((row,i)=>{
+          const m=row.m,dir=row.folder;
+          const li=document.createElement('div');
+          li.className='item';
+          const icon=m.icon?BASE+dir+'/'+m.icon:null;
+          li.innerHTML=(icon
+            ?'<img src="'+icon+'" alt="" onerror="this.outerHTML=\'<div class=ph></div>\'">'
+            :'<div class="ph"></div>')+'<span>'+(m.name||dir)+'</span>';
+          li.addEventListener('click',()=>select(li,m,dir));
+          listEl.appendChild(li);
+          if(i===0) select(li,m,dir);
+        });
+      })
+      .catch(()=>{loaded=false;detailEl.innerHTML='<div class="status">Не удалось загрузить список моделей.</div>';});
+  }
+
+  let savedScroll=0;
+  let lockTimer=null;     // pending "scroll to top, then lock" chain from open()
+  function clearPendingLock(){ if(lockTimer){clearTimeout(lockTimer);lockTimer=null;} }
+  function lockScroll(){
+    // never lock if the panel was closed again in the meantime
+    if(!document.body.classList.contains('models-open')) return;
+    document.body.style.top=(-savedScroll)+'px';   // keep the frozen page in place
+    document.documentElement.classList.add('scroll-locked');
+    document.body.classList.add('scroll-locked');
+  }
+  function open(){
+    if(document.body.classList.contains('models-open')) return;
+    document.body.classList.add('models-open');
+    document.documentElement.classList.add('models-open');
+    loadModels();
+    // smoothly reset scroll to the very top, THEN lock there (locking too early
+    // would freeze the page before the smooth scroll could play). setTimeout
+    // polling is used instead of rAF so it still fires in throttled tabs.
+    savedScroll=0;
+    clearPendingLock();
+    if((window.scrollY||window.pageYOffset||0)<=0){
+      lockScroll();
+    } else {
+      window.scrollTo({top:0,behavior:'smooth'});
+      let elapsed=0;
+      const waitTop=function(){
+        lockTimer=null;
+        // bail out if the panel was closed during the wait — otherwise this
+        // late lock would freeze the page (position:fixed) while it's closed
+        if(!document.body.classList.contains('models-open')) return;
+        if((window.scrollY||window.pageYOffset||0)<=0 || elapsed>=900){
+          lockScroll();
+        } else {
+          elapsed+=50;
+          lockTimer=setTimeout(waitTop,50);
+        }
+      };
+      lockTimer=setTimeout(waitTop,50);
+    }
+  }
+  function close(){
+    if(!document.body.classList.contains('models-open')) return;
+    // start the visual close (fade/scale out)
+    document.body.classList.remove('models-open');
+    document.documentElement.classList.remove('models-open');
+    clearPendingLock();   // cancel a not-yet-fired lock from a quick open->close
+    // keep the scroll lock until the close animation finishes, then restore —
+    // releasing it early makes the panel jump while it's still fading out
+    const modelsEl=document.getElementById('models');
+    let done=false;
+    const unlock=function(){
+      if(done) return; done=true;
+      modelsEl.removeEventListener('transitionend',onEnd);
+      // if the panel was reopened before this fired, keep it locked
+      if(document.body.classList.contains('models-open')) return;
+      document.documentElement.classList.remove('scroll-locked');
+      document.body.classList.remove('scroll-locked');
+      document.body.style.top='';
+      window.scrollTo(0,savedScroll);              // restore where the user was
+    };
+    const onEnd=function(e){ if(e.target===modelsEl && e.propertyName==='opacity') unlock(); };
+    modelsEl.addEventListener('transitionend',onEnd);
+    setTimeout(unlock,700);                         // fallback if transitionend doesn't fire
+  }
+
+  document.getElementById('toModels').addEventListener('click',open);
+  document.getElementById('closeModels').addEventListener('click',close);
+  document.getElementById('dim').addEventListener('click',close);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+})();
+</script>
+
+</body>
+</html>
