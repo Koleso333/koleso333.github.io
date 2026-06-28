@@ -580,7 +580,7 @@ body.models-open .panel{transform:scale(1)}
     if(m.parameters!=null) meta.push(['Параметры',fmt(m.parameters)]);
     if(m.date) meta.push(['Дата выхода',m.date]);
     if(m.author) meta.push(['Автор',m.author]);
-    if(m.file) meta.push(['Файл',m.file]);
+    if(m.apx) meta.push(['Архитектура',m.apx]);
     detailEl.innerHTML=
       '<div class="detail-head">'+
         (icon?'<img src="'+icon+'" alt="" onerror="this.outerHTML=\'<div class=ph></div>\'">':'<div class="ph"></div>')+
